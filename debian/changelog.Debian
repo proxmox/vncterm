@@ -1,0 +1,25 @@
+vncterm (1.0-1) unstable; urgency=low
+
+  * use TigerVNC java sources
+  
+  * implement TLS encryption and vencrypt password auth
+  
+  * removed support for -passwdfile option
+
+ -- root <root@maui.maurer-it.com>  Mon, 24 Jan 2011 10:46:25 +0100
+
+vncterm (0.9-2) unstable; urgency=low
+
+  * compiled for debian etch
+  
+  * use memmove instead of rfbDoCopyRect (avoid SIGSEGV when
+  called with negative dy)
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 22 Apr 2009 10:02:08 +0200
+
+vncterm (0.9-1) stable; urgency=low
+
+  * initial import
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 27 Dec 2007 05:57:17 +0100
+

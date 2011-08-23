@@ -1,0 +1,114 @@
+Index: new/java/src/com/tigervnc/vncviewer/VncViewer.java
+===================================================================
+--- new.orig/java/src/com/tigervnc/vncviewer/VncViewer.java	2011-01-24 15:39:36.000000000 +0100
++++ new/java/src/com/tigervnc/vncviewer/VncViewer.java	2011-01-24 16:08:09.000000000 +0100
+@@ -27,11 +27,15 @@
+ 
+ package com.tigervnc.vncviewer;
+ 
++import netscape.javascript.*;
+ import java.awt.*;
+ import java.awt.event.*;
+ import java.io.*;
+ import java.net.*;
+ 
++import java.awt.Graphics;
++import java.applet.Applet;
++
+ public class VncViewer extends java.applet.Applet
+   implements java.lang.Runnable, WindowListener, ComponentListener {
+ 
+@@ -91,6 +95,9 @@
+   int debugStatsExcludeUpdates;
+   int debugStatsMeasureUpdates;
+ 
++  JSObject jswin;
++  String myid;
++
+   // Reference to this applet for inter-applet communication.
+   public static java.applet.Applet refApplet;
+ 
+@@ -104,6 +111,11 @@
+ 
+     refApplet = this;
+ 
++    if (inAnApplet) {
++      jswin = JSObject.getWindow(this);
++      myid = getParameter("id");
++    }
++
+     if (inSeparateFrame) {
+       vncFrame = new Frame("TigerVNC");
+       if (!inAnApplet) {
+@@ -134,6 +146,9 @@
+ 
+     rfbThread = new Thread(this);
+     rfbThread.start();
++
++    String[] myparam = { myid, "init"};
++    jswin.call("PVE_vnc_console_event", myparam);
+   }
+ 
+   public void update(Graphics g) {
+@@ -936,6 +951,8 @@
+ 
+     if (inAnApplet) {
+       showMessage("Disconnected");
++      String[] myparam = { myid, "disconnect"};
++      jswin.call("PVE_vnc_console_event", myparam);
+     } else {
+       System.exit(0);
+     }
+@@ -953,6 +970,8 @@
+       // vncContainer null, applet not inited,
+       // can not present the error to the user.
+       Thread.currentThread().stop();
++      String[] myparam = { myid, "error", str};
++      jswin.call("PVE_vnc_console_event", myparam);
+     } else {
+       System.exit(1);
+     }
+@@ -974,6 +993,8 @@
+       rfb.close();
+ 
+     if (inAnApplet) {
++      String[] myparam = { myid, "error", str};
++      jswin.call("PVE_vnc_console_event", myparam);
+       showMessage(str);
+     } else {
+       System.exit(1);
+@@ -1043,6 +1064,9 @@
+       rfb.close();
+     if (inSeparateFrame)
+       vncFrame.dispose();
++
++    String[] myparam = { myid, "destroy"};
++    jswin.call("PVE_vnc_console_event", myparam);
+   }
+ 
+   //
+@@ -1091,6 +1115,8 @@
+     if (!inAnApplet) {
+       System.exit(0);
+     }
++    String[] myparam = { myid, "close"};
++    jswin.call("PVE_vnc_console_event", myparam);
+   }
+ 
+   //
+Index: new/java/src/com/tigervnc/vncviewer/Makefile
+===================================================================
+--- new.orig/java/src/com/tigervnc/vncviewer/Makefile	2011-01-24 15:39:36.000000000 +0100
++++ new/java/src/com/tigervnc/vncviewer/Makefile	2011-01-24 16:08:09.000000000 +0100
+@@ -4,7 +4,10 @@
+ 
+ CP = cp
+ JC = javac
+-JCFLAGS = -target 1.5 -classpath ../../../
++# define java.ext.dirs, else plugin.jar (JSObject) is not found
++# is there a better way to include that?
++JCFLAGS = -target 1.5 -classpath ../../../ -Djava.ext.dirs=/usr/lib/jvm/java-6-sun-1.6.0.22/jre/lib/
++
+ JAR = jar
+ ARCHIVE = VncViewer.jar
+ MANIFEST = MANIFEST.MF

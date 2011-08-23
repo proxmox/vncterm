@@ -1,0 +1,47 @@
+Simple VNC terminal emulator (inspired by VncCommand)
+
+We try to simulate a 'xterm', because we want to support:
+
+	- unicode
+	- mouse
+	
+and xterm seems to be the best solution for that.
+
+some code is inspired by: qemu, VncCommand, xterm, linux kernel, ...
+
+libvncserver
+============
+
+LibVNCServer does not suppurt TLS currently. So we staically link to a
+patched versions on that library instead of using the debian shared
+libraries.
+
+VNC Java Applet (for use in web based applications):
+====================================================
+
+We use patched VncViewer files (latest TigerVNC sources):
+
+http://www.tigervnc.com/
+
+We sign the applet to make clipboard working.
+
+
+TODO:
+=====
+
+Useful sources for terminal emulation:
+	
+   xterm source: ctlseqs.txt
+   http://vt100.net/docs/vt220-rm
+   man 5 terminfo
+   infocmp xterm
+   man console_codes
+
+Fonts: 
+
+we currently use fonts provided by the debian console-data package:
+see /usr/share/consolefonts/*
+
+Only 8x16 fonts are supported
+
+TODO contains a list of unimplemented things.

@@ -1,0 +1,70 @@
+Index: vnc/libvncserver/auth.c
+===================================================================
+@@ -270,8 +270,9 @@
+     int32_t securityType = rfbSecTypeInvalid;
+ 
+     if (!cl->screen->authPasswdData || cl->reverseConnection) {
+-	/* chk if this condition is valid or not. */
+-	securityType = rfbSecTypeNone;
++	    /* chk if this condition is valid or not. */
++	    /* we disable anonymous auth */
++	    // securityType = rfbSecTypeNone;
+     } else if (cl->screen->authPasswdData) {
+  	    securityType = rfbSecTypeVncAuth;
+     }
+Index: vnc/newterm/Makefile.am
+Index: vnc/libvncserver/sockets.c
+===================================================================
+--- vnc.orig/libvncserver/sockets.c	2011-01-20 16:42:41.000000000 +0100
++++ vnc/libvncserver/sockets.c	2011-01-21 10:20:03.000000000 +0100
+@@ -454,8 +454,12 @@
+     fd_set fds;
+     struct timeval tv;
+ 
++
+     while (len > 0) {
+-        n = read(sock, buf, len);
++	    if (cl->sock_read_fn)
++		    n = cl->sock_read_fn(cl, buf, len);
++	    else
++		    n = read(sock, buf, len);
+ 
+         if (n > 0) {
+ 
+@@ -538,7 +542,10 @@
+ 
+     LOCK(cl->outputMutex);
+     while (len > 0) {
+-        n = write(sock, buf, len);
++	if (cl->sock_write_fn)
++	    n = cl->sock_write_fn(cl, buf, len);
++	else
++	    n = write(sock, buf, len);
+ 
+         if (n > 0) {
+ 
+Index: vnc/rfb/rfb.h
+===================================================================
+--- vnc.orig/rfb/rfb.h	2011-01-20 16:36:06.000000000 +0100
++++ vnc/rfb/rfb.h	2011-01-21 06:44:22.000000000 +0100
+@@ -397,6 +397,9 @@
+     struct _rfbStatList *Next;
+ } rfbStatList;
+ 
++typedef ssize_t (*sock_read_fn_t)(struct _rfbClientRec *cl, void *buf, size_t count);
++typedef ssize_t (*sock_write_fn_t)(struct _rfbClientRec *cl, const void *buf, size_t count);
++
+ typedef struct _rfbClientRec {
+   
+     /* back pointer to the screen */
+@@ -417,6 +420,10 @@
+     void* clientData;
+     ClientGoneHookPtr clientGoneHook;
+ 
++    /* use to hook up TLS read/write */
++    sock_read_fn_t sock_read_fn;
++    sock_read_fn_t sock_write_fn;
++
+     SOCKET sock;
+     char *host;
+ 

@@ -1,0 +1,12 @@
+
+TODO:
+	better command line parser - print usage infos
+	implement some kind of regression testing
+ 	cleanup the TLS patch and try to merge into upstream
+	scroll/history support?
+	more ESC sequences (see xterm source ctlseqs.txt)
+	disp_ctrl
+	add arabic font glyphs	
+	add japanese font glyphs
+	add other font glyphs (maybe http://openlab.jp/efont/unicode/)?
+
