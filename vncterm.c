@@ -2358,8 +2358,6 @@ main (int argc, char** argv)
   dimensions.ws_col = vt->width;
   dimensions.ws_row = vt->height;
 
-  setsid ();
-
   setenv ("TERM", TERM, 1);
 
   pid = forkpty (&master, ptyname, NULL, &dimensions);

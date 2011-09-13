@@ -1,3 +1,10 @@
+vncterm (1.0-2) unstable; urgency=low
+
+  * do not create a new process group (with setsid), so
+  we can kill the whole pve task if used inside fork_worker().
+
+ -- Proxmox Support Team <support@proxmox.com>  Tue, 13 Sep 2011 10:49:32 +0200
+
 vncterm (1.0-1) unstable; urgency=low
 
   * use TigerVNC java sources
