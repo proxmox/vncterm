@@ -1,3 +1,9 @@
+vncterm (1.0-3) unstable; urgency=low
+
+  * fix focus traversal
+
+ -- Proxmox Support Team <support@proxmox.com>  Tue, 21 Aug 2012 09:14:04 +0200
+
 vncterm (1.0-2) unstable; urgency=low
 
   * do not create a new process group (with setsid), so
