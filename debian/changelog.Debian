@@ -1,3 +1,9 @@
+vncterm (1.1-1) unstable; urgency=low
+
+  * recompile for wheezy
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 15 Mar 2013 08:26:04 +0100
+
 vncterm (1.0-3) unstable; urgency=low
 
   * fix focus traversal
