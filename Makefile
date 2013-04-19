@@ -13,6 +13,7 @@ VNCSRC=${VNCDIR}.tar.gz
 VNCLIB=${VNCDIR}/libvncserver/.libs/libvncserver.a
 
 TIGERVNCSRC=tigervnc-1.1.0.tgz
+#TIGERVNCSRC=tigervnc-1.2.0.tgz
 
 DEB=${PACKAGE}_${VERSION}-${PACKAGERELEASE}_${ARCH}.deb
 SNAP=${PACKAGE}-${VERSION}-${CDATE}.tar.gz
@@ -46,12 +47,16 @@ jar: tigervnc.org
 	cd tigervnc; quilt push -a
 	cd tigervnc/java/src/com/tigervnc/vncviewer; make clean; make
 	jarsigner -keystore ${KEYSTORE} -signedjar VncViewer.jar  tigervnc/java/src/com/tigervnc/vncviewer/VncViewer.jar proxmox
+# this is for version 1.2
+#	ln -s ../newtigerpatches tigervnc/patches
+#	cd tigervnc/java;cmake -G "Unix Makefiles"; make
+#	jarsigner -keystore ${KEYSTORE} -signedjar VncViewer.jar  tigervnc/java/VncViewer.jar proxmox
 
 tigervnc.org: ${TIGERVNCSRC}
 	rm -rf tigervnc.org
 	tar xf ${TIGERVNCSRC}
 
-downlaod:
+download:
 	rm -rf tigervnc.org
 	svn co https://tigervnc.svn.sourceforge.net/svnroot/tigervnc/tags/1_1_0 tigervnc.org 
 	tar cf ${TIGERVNCSRC} tigervnc.org
