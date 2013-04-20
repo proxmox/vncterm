@@ -2,7 +2,7 @@ RELEASE=2.1
 
 PACKAGE=vncterm
 VERSION=1.0
-PACKAGERELEASE=3
+PACKAGERELEASE=4
 ARCH:=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
 CDATE:=$(shell date +%F)
 
