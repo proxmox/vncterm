@@ -9,8 +9,8 @@
 
 Index: new/java/src/com/tigervnc/vncviewer/X509Tunnel.java
 ===================================================================
---- new.orig/java/src/com/tigervnc/vncviewer/X509Tunnel.java	2011-01-28 13:22:50.000000000 +0100
-+++ new/java/src/com/tigervnc/vncviewer/X509Tunnel.java	2011-01-28 13:26:51.000000000 +0100
+--- new.orig/java/src/com/tigervnc/vncviewer/X509Tunnel.java	2013-04-20 15:24:59.000000000 +0200
++++ new/java/src/com/tigervnc/vncviewer/X509Tunnel.java	2013-04-20 15:28:55.000000000 +0200
 @@ -26,13 +26,23 @@
  import javax.net.ssl.*;
  import java.security.*;
@@ -99,8 +99,8 @@ Index: new/java/src/com/tigervnc/vncviewer/X509Tunnel.java
  }
 Index: new/java/src/com/tigervnc/vncviewer/RfbProto.java
 ===================================================================
---- new.orig/java/src/com/tigervnc/vncviewer/RfbProto.java	2011-01-28 13:22:50.000000000 +0100
-+++ new/java/src/com/tigervnc/vncviewer/RfbProto.java	2011-01-28 13:26:51.000000000 +0100
+--- new.orig/java/src/com/tigervnc/vncviewer/RfbProto.java	2013-04-20 15:24:59.000000000 +0200
++++ new/java/src/com/tigervnc/vncviewer/RfbProto.java	2013-04-20 15:28:55.000000000 +0200
 @@ -411,7 +411,8 @@
      }
  
@@ -113,18 +113,18 @@ Index: new/java/src/com/tigervnc/vncviewer/RfbProto.java
  
 Index: new/java/src/com/tigervnc/vncviewer/VncViewer.java
 ===================================================================
---- new.orig/java/src/com/tigervnc/vncviewer/VncViewer.java	2011-01-28 13:26:16.000000000 +0100
-+++ new/java/src/com/tigervnc/vncviewer/VncViewer.java	2011-01-28 13:26:51.000000000 +0100
-@@ -95,6 +95,8 @@
+--- new.orig/java/src/com/tigervnc/vncviewer/VncViewer.java	2013-04-20 15:28:42.000000000 +0200
++++ new/java/src/com/tigervnc/vncviewer/VncViewer.java	2013-04-20 15:29:55.000000000 +0200
+@@ -91,6 +91,8 @@
    int debugStatsExcludeUpdates;
    int debugStatsMeasureUpdates;
  
 +  String PVECert;
 +
-   JSObject jswin;
-   String myid;
+   // Reference to this applet for inter-applet communication.
+   public static java.applet.Applet refApplet;
  
-@@ -278,7 +280,7 @@
+@@ -263,7 +265,7 @@
  	fatalError(e.toString(), e);
        }
      }
@@ -133,7 +133,7 @@ Index: new/java/src/com/tigervnc/vncviewer/VncViewer.java
    }
  
    //
-@@ -314,7 +316,7 @@
+@@ -299,7 +301,7 @@
    // If the rfbThread is being stopped, ignore any exceptions,
    // otherwise rethrow the exception so it can be handled.
    //
@@ -142,7 +142,7 @@ Index: new/java/src/com/tigervnc/vncviewer/VncViewer.java
    void processNormalProtocol() throws Exception {
      try {
        vc.processNormalProtocol();
-@@ -857,6 +859,11 @@
+@@ -842,6 +844,11 @@
  
      // SocketFactory.
      socketFactory = readParameter("SocketFactory", false);
@@ -154,7 +154,7 @@ Index: new/java/src/com/tigervnc/vncviewer/VncViewer.java
    }
  
    //
-@@ -1010,7 +1017,7 @@
+@@ -991,7 +998,7 @@
    }
  
    synchronized public void fatalError(String str, Exception e) {
@@ -163,7 +163,7 @@ Index: new/java/src/com/tigervnc/vncviewer/VncViewer.java
      if (rfb != null && rfb.closed()) {
        // Not necessary to show error message if the error was caused
        // by I/O problems after the rfb.close() method call.
-@@ -1108,11 +1115,11 @@
+@@ -1084,11 +1091,11 @@
    public void enableInput(boolean enable) {
      vc.enableInput(enable);
    }
@@ -177,7 +177,7 @@ Index: new/java/src/com/tigervnc/vncviewer/VncViewer.java
    public void componentResized(ComponentEvent e) {
      if (e.getComponent() == vncFrame) {
        if (options.autoScale) {
-@@ -1124,11 +1131,11 @@
+@@ -1100,11 +1107,11 @@
        }
      }
    }
