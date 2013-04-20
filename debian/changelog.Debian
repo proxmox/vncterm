@@ -1,3 +1,13 @@
+vncterm (1.1-2) unstable; urgency=low
+
+  * recompile VnCViewer.jar with openJDK
+  
+  * set trusted-lib to avoid security popup
+  
+  * disable unused javascript-events.patch
+
+ -- Proxmox Support Team <support@proxmox.com>  Sat, 20 Apr 2013 16:05:41 +0200
+
 vncterm (1.1-1) unstable; urgency=low
 
   * recompile for wheezy
