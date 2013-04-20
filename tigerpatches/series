@@ -4,3 +4,4 @@ export-ctrl-alt-delete.patch
 trust-manager.patch
 username-param.patch
 fix-tab-button.patch
+set-trusted-lib.patch
