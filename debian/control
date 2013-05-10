@@ -1,5 +1,5 @@
 Package: vncterm
-Version: 1.1-2
+Version: 1.1-3
 Section: x11
 Priority: optional
 Depends: libc6 (>= 2.7-18), libjpeg62, zlib1g (>= 1:1.2.1), libvncserver0
