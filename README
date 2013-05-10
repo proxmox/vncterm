@@ -32,6 +32,10 @@ http://sourceforge.net/tracker/?func=detail&aid=3488166&group_id=254363&atid=112
 
 I put patches for 1.2.0 to newtigerpatches subdir.
 
+Note: javascript-events.patch requires JSObject, which is inside plugin.jar
+previously provided by sun-java-jdk. For wheezy/openjdk, we need to install
+package "icedtea-netx-common" which contains that file.
+
 TODO:
 =====
 

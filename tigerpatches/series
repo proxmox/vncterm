@@ -6,3 +6,4 @@ fix-makefiles.patch
 username-param.patch
 fix-tab-button.patch
 set-trusted-lib.patch
+javascript-events.patch

@@ -41,6 +41,7 @@ vncterm: vncterm.c glyphs.h ${VNCLIB}
 	gcc -O2 -g -o $@ vncterm.c -Wall -D_GNU_SOURCE -I ${VNCDIR} ${VNCLIB} -lnsl -lpthread -lz -ljpeg -lutil -lgnutls
 
 jar: tigervnc.org
+	if test ! -f /usr/share/icedtea-web/plugin.jar; then echo "please install package icedtea-netx-common"; exit 1; fi
 	rm -rf tigervnc VncViewer.jar
 	rsync -av --exclude .svn --exclude .svnignore  tigervnc.org/ tigervnc
 	ln -s ../tigerpatches tigervnc/patches

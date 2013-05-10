@@ -1,7 +1,7 @@
 Index: new/java/src/com/tigervnc/vncviewer/VncViewer.java
 ===================================================================
---- new.orig/java/src/com/tigervnc/vncviewer/VncViewer.java	2011-01-24 15:39:36.000000000 +0100
-+++ new/java/src/com/tigervnc/vncviewer/VncViewer.java	2011-01-24 16:08:09.000000000 +0100
+--- new.orig/java/src/com/tigervnc/vncviewer/VncViewer.java	2013-05-10 07:41:18.000000000 +0200
++++ new/java/src/com/tigervnc/vncviewer/VncViewer.java	2013-05-10 07:41:18.000000000 +0200
 @@ -27,11 +27,15 @@
  
  package com.tigervnc.vncviewer;
@@ -18,9 +18,9 @@ Index: new/java/src/com/tigervnc/vncviewer/VncViewer.java
  public class VncViewer extends java.applet.Applet
    implements java.lang.Runnable, WindowListener, ComponentListener {
  
-@@ -91,6 +95,9 @@
-   int debugStatsExcludeUpdates;
-   int debugStatsMeasureUpdates;
+@@ -94,6 +98,9 @@
+ 
+   String PVECert;
  
 +  JSObject jswin;
 +  String myid;
@@ -28,7 +28,7 @@ Index: new/java/src/com/tigervnc/vncviewer/VncViewer.java
    // Reference to this applet for inter-applet communication.
    public static java.applet.Applet refApplet;
  
-@@ -104,6 +111,11 @@
+@@ -129,6 +136,11 @@
  
      refApplet = this;
  
@@ -40,7 +40,7 @@ Index: new/java/src/com/tigervnc/vncviewer/VncViewer.java
      if (inSeparateFrame) {
        vncFrame = new Frame("TigerVNC");
        if (!inAnApplet) {
-@@ -134,6 +146,9 @@
+@@ -159,6 +171,9 @@
  
      rfbThread = new Thread(this);
      rfbThread.start();
@@ -50,7 +50,7 @@ Index: new/java/src/com/tigervnc/vncviewer/VncViewer.java
    }
  
    public void update(Graphics g) {
-@@ -936,6 +951,8 @@
+@@ -1002,6 +1017,8 @@
  
      if (inAnApplet) {
        showMessage("Disconnected");
@@ -59,7 +59,7 @@ Index: new/java/src/com/tigervnc/vncviewer/VncViewer.java
      } else {
        System.exit(0);
      }
-@@ -953,6 +970,8 @@
+@@ -1019,6 +1036,8 @@
        // vncContainer null, applet not inited,
        // can not present the error to the user.
        Thread.currentThread().stop();
@@ -68,7 +68,7 @@ Index: new/java/src/com/tigervnc/vncviewer/VncViewer.java
      } else {
        System.exit(1);
      }
-@@ -974,6 +993,8 @@
+@@ -1040,6 +1059,8 @@
        rfb.close();
  
      if (inAnApplet) {
@@ -77,7 +77,7 @@ Index: new/java/src/com/tigervnc/vncviewer/VncViewer.java
        showMessage(str);
      } else {
        System.exit(1);
-@@ -1043,6 +1064,9 @@
+@@ -1109,6 +1130,9 @@
        rfb.close();
      if (inSeparateFrame)
        vncFrame.dispose();
@@ -87,7 +87,7 @@ Index: new/java/src/com/tigervnc/vncviewer/VncViewer.java
    }
  
    //
-@@ -1091,6 +1115,8 @@
+@@ -1157,6 +1181,8 @@
      if (!inAnApplet) {
        System.exit(0);
      }
@@ -98,17 +98,14 @@ Index: new/java/src/com/tigervnc/vncviewer/VncViewer.java
    //
 Index: new/java/src/com/tigervnc/vncviewer/Makefile
 ===================================================================
---- new.orig/java/src/com/tigervnc/vncviewer/Makefile	2011-01-24 15:39:36.000000000 +0100
-+++ new/java/src/com/tigervnc/vncviewer/Makefile	2011-01-24 16:08:09.000000000 +0100
-@@ -4,7 +4,10 @@
+--- new.orig/java/src/com/tigervnc/vncviewer/Makefile	2013-05-10 07:41:18.000000000 +0200
++++ new/java/src/com/tigervnc/vncviewer/Makefile	2013-05-10 07:43:17.000000000 +0200
+@@ -4,7 +4,7 @@
  
  CP = cp
  JC = javac
--JCFLAGS = -target 1.5 -classpath ../../../
-+# define java.ext.dirs, else plugin.jar (JSObject) is not found
-+# is there a better way to include that?
-+JCFLAGS = -target 1.5 -classpath ../../../ -Djava.ext.dirs=/usr/lib/jvm/java-6-sun-1.6.0.22/jre/lib/
-+
+-JCFLAGS = -target 1.7 -classpath ../../../
++JCFLAGS = -target 1.7 -classpath ../../../ -Djava.ext.dirs=/usr/share/icedtea-web/
  JAR = jar
  ARCHIVE = VncViewer.jar
  MANIFEST = MANIFEST.MF
