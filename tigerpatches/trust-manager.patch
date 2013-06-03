@@ -7,10 +7,10 @@
  certificate (or CA who signed the server certificate) as applet 
  parameter "PVECert" (newline encoded as '|').
 
-Index: new/java/src/com/tigervnc/vncviewer/X509Tunnel.java
+Index: tigervnc/java/src/com/tigervnc/vncviewer/X509Tunnel.java
 ===================================================================
---- new.orig/java/src/com/tigervnc/vncviewer/X509Tunnel.java	2013-04-20 15:24:59.000000000 +0200
-+++ new/java/src/com/tigervnc/vncviewer/X509Tunnel.java	2013-04-20 15:28:55.000000000 +0200
+--- tigervnc.orig/java/src/com/tigervnc/vncviewer/X509Tunnel.java	2013-06-03 08:17:17.000000000 +0200
++++ tigervnc/java/src/com/tigervnc/vncviewer/X509Tunnel.java	2013-06-03 08:22:52.000000000 +0200
 @@ -26,13 +26,23 @@
  import javax.net.ssl.*;
  import java.security.*;
@@ -36,7 +36,7 @@ Index: new/java/src/com/tigervnc/vncviewer/X509Tunnel.java
    }
  
    protected void setParam (SSLSocket sock)
-@@ -52,9 +62,51 @@
+@@ -52,9 +62,48 @@
    protected void initContext (SSLContext sc) throws java.security.
      GeneralSecurityException
    {
@@ -64,9 +64,6 @@ Index: new/java/src/com/tigervnc/vncviewer/X509Tunnel.java
 +	    if (certs == null || certs.length < 1) {
 +	      throw new CertificateException("no certs");
 +	    }
-+	    if (certs == null || certs.length > 1) {
-+	      throw new CertificateException("cert path too long");
-+	    }
 +	    PublicKey cakey = pvecert.getPublicKey();
 +
 +	    boolean ca_match;
@@ -91,16 +88,16 @@ Index: new/java/src/com/tigervnc/vncviewer/X509Tunnel.java
      sc.init (null, myTM, null);
    }
  
-@@ -100,4 +152,5 @@
+@@ -100,4 +149,5 @@
        return tm.getAcceptedIssuers ();
      }
    }
 +
  }
-Index: new/java/src/com/tigervnc/vncviewer/RfbProto.java
+Index: tigervnc/java/src/com/tigervnc/vncviewer/RfbProto.java
 ===================================================================
---- new.orig/java/src/com/tigervnc/vncviewer/RfbProto.java	2013-04-20 15:24:59.000000000 +0200
-+++ new/java/src/com/tigervnc/vncviewer/RfbProto.java	2013-04-20 15:28:55.000000000 +0200
+--- tigervnc.orig/java/src/com/tigervnc/vncviewer/RfbProto.java	2013-06-03 08:17:17.000000000 +0200
++++ tigervnc/java/src/com/tigervnc/vncviewer/RfbProto.java	2013-06-03 08:19:05.000000000 +0200
 @@ -411,7 +411,8 @@
      }
  
@@ -111,10 +108,10 @@ Index: new/java/src/com/tigervnc/vncviewer/RfbProto.java
  	tunnel.setup (this);
      }
  
-Index: new/java/src/com/tigervnc/vncviewer/VncViewer.java
+Index: tigervnc/java/src/com/tigervnc/vncviewer/VncViewer.java
 ===================================================================
---- new.orig/java/src/com/tigervnc/vncviewer/VncViewer.java	2013-04-20 15:28:42.000000000 +0200
-+++ new/java/src/com/tigervnc/vncviewer/VncViewer.java	2013-04-20 15:29:55.000000000 +0200
+--- tigervnc.orig/java/src/com/tigervnc/vncviewer/VncViewer.java	2013-06-03 08:19:03.000000000 +0200
++++ tigervnc/java/src/com/tigervnc/vncviewer/VncViewer.java	2013-06-03 08:19:05.000000000 +0200
 @@ -91,6 +91,8 @@
    int debugStatsExcludeUpdates;
    int debugStatsMeasureUpdates;
