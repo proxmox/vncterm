@@ -18,7 +18,7 @@ TIGERVNCSRC=tigervnc-1.1.0.tgz
 DEB=${PACKAGE}_${VERSION}-${PACKAGERELEASE}_${ARCH}.deb
 SNAP=${PACKAGE}-${VERSION}-${CDATE}.tar.gz
 
-KEYSTORE=/home/dietmar/pve2-proxdev/proxmox-dev/proxmox-java.keystore
+KEYSTORE=/home/dietmar/pve2-proxdev/proxmox-dev/comodo-for-java.keystore
 
 all: vncterm
 
@@ -47,7 +47,8 @@ jar: tigervnc.org
 	ln -s ../tigerpatches tigervnc/patches
 	cd tigervnc; quilt push -a
 	cd tigervnc/java/src/com/tigervnc/vncviewer; make clean; make
-	jarsigner -keystore ${KEYSTORE} -signedjar VncViewer.jar  tigervnc/java/src/com/tigervnc/vncviewer/VncViewer.jar proxmox
+	jarsigner -keystore ${KEYSTORE} -signedjar VncViewer.jar  tigervnc/java/src/com/tigervnc/vncviewer/VncViewer.jar "proxmox server solutions gmbh's comodo ca limited id"
+
 # this is for version 1.2
 #	ln -s ../newtigerpatches tigervnc/patches
 #	cd tigervnc/java;cmake -G "Unix Makefiles"; make
