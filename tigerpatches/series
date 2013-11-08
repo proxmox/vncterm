@@ -5,5 +5,5 @@ trust-manager.patch
 fix-makefiles.patch
 username-param.patch
 fix-tab-button.patch
-set-trusted-lib.patch
+modify-jar-manifest.patch
 javascript-events.patch
