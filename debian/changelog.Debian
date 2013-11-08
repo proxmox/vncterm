@@ -1,3 +1,12 @@
+vncterm (1.1-6) unstable; urgency=low
+
+  * set Caller-Allowable-Codebase and remove Trusted-Library. This avoids
+    security popups with latest Java 7u45. Also see:
+  
+    http://stackoverflow.com/questions/19393826/java-applet-manifest-allow-all-caller-allowable-codebase
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 08 Nov 2013 11:27:08 +0100
+
 vncterm (1.1-5) unstable; urgency=low
 
   * use Comodo code sign cert for applet signature
