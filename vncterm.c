@@ -2196,6 +2196,8 @@ new_client (rfbClientPtr client)
   return RFB_CLIENT_ACCEPT;
 }
 
+static char *vncticket = NULL;
+
 vncTerm *
 create_vncterm (int argc, char** argv, int maxx, int maxy)
 {
@@ -2203,6 +2205,8 @@ create_vncterm (int argc, char** argv, int maxx, int maxy)
 
   rfbScreenInfoPtr screen = rfbGetScreen (&argc, argv, maxx, maxy, 8, 1, 1);
   screen->frameBuffer=(char*)calloc(maxx*maxy, 1);
+
+  char **passwds = calloc(sizeof(char**), 2);
 
   vncTerm *vt = (vncTerm *)calloc (sizeof(vncTerm), 1);
 
@@ -2272,7 +2276,15 @@ create_vncterm (int argc, char** argv, int maxx, int maxy)
 
   //screen->autoPort = 1;
 
-  rfbRegisterSecurityHandler(&VncSecurityHandlerVencrypt);
+  if (vncticket) {
+      passwds[0] = vncticket;
+      passwds[1] = NULL;
+  
+      screen->authPasswdData = (void *)passwds;
+      screen->passwordCheck = rfbCheckPasswordByList;
+  } else {
+      rfbRegisterSecurityHandler(&VncSecurityHandlerVencrypt);
+  }
 
   rfbInitServer(screen);
 
@@ -2333,6 +2345,13 @@ main (int argc, char** argv)
       CHECK_ARGC (argc, argv, i);
       auth_perm = argv[i+1];
       rfbPurgeArguments(&argc, &i, 2, argv);
+    }
+    if (!strcmp (argv[i], "-notls")) {
+        rfbPurgeArguments(&argc, &i, 1, argv);
+        if ((vncticket = getenv("PVE_VNC_TICKET")) == NULL) {
+ 	  fprintf(stderr, "missing env PVE_VNC_TICKET (-notls)\n");
+	  exit(-1);           
+        }
     }
   }
 
