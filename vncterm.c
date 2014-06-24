@@ -2334,26 +2334,25 @@ main (int argc, char** argv)
     if (!strcmp (argv[i], "-timeout")) {
       CHECK_ARGC (argc, argv, i);
       idle_timeout = atoi(argv[i+1]);
-      rfbPurgeArguments(&argc, &i, 2, argv);
-    }
-    if (!strcmp (argv[i], "-authpath")) {
+      rfbPurgeArguments(&argc, &i, 2, argv); i--;
+    } else if (!strcmp (argv[i], "-authpath")) {
       CHECK_ARGC (argc, argv, i);
       auth_path = argv[i+1];
-      rfbPurgeArguments(&argc, &i, 2, argv);
-    }
-    if (!strcmp (argv[i], "-perm")) {
+      rfbPurgeArguments(&argc, &i, 2, argv); i--;
+    } else if (!strcmp (argv[i], "-perm")) {
       CHECK_ARGC (argc, argv, i);
       auth_perm = argv[i+1];
-      rfbPurgeArguments(&argc, &i, 2, argv);
-    }
-    if (!strcmp (argv[i], "-notls")) {
-        rfbPurgeArguments(&argc, &i, 1, argv);
+      rfbPurgeArguments(&argc, &i, 2, argv); i--;
+    } else if (!strcmp (argv[i], "-notls")) {
+        rfbPurgeArguments(&argc, &i, 1, argv); i--;
         if ((vncticket = getenv("PVE_VNC_TICKET")) == NULL) {
- 	  fprintf(stderr, "missing env PVE_VNC_TICKET (-notls)\n");
+          fprintf(stderr, "missing env PVE_VNC_TICKET (-notls)\n");
 	  exit(-1);           
         }
     }
   }
+
+  unsetenv("PVE_VNC_TICKET"); // do not expose this to child
 
 #ifdef DEBUG
   rfbLogEnable (1);
