@@ -1,3 +1,9 @@
+vncterm (1.1-8) unstable; urgency=low
+
+  * update applet signature (new code signing cert)
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 25 Jul 2014 06:57:46 +0200
+
 vncterm (1.1-7) unstable; urgency=low
 
   *  new option -notls (for novnc)

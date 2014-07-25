@@ -3,7 +3,7 @@ RELEASE=3.2
 PACKAGE=vncterm
 # Note: also change version in debian/control and debian/changelog
 VERSION=1.1
-PACKAGERELEASE=7
+PACKAGERELEASE=8
 ARCH:=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
 CDATE:=$(shell date +%F)
 
@@ -47,7 +47,7 @@ jar: tigervnc.org
 	ln -s ../tigerpatches tigervnc/patches
 	cd tigervnc; quilt push -a
 	cd tigervnc/java/src/com/tigervnc/vncviewer; make clean; make
-	jarsigner -keystore ${KEYSTORE} -signedjar VncViewer.jar  tigervnc/java/src/com/tigervnc/vncviewer/VncViewer.jar "proxmox server solutions gmbh's comodo ca limited id"
+	jarsigner -keystore ${KEYSTORE} -signedjar VncViewer.jar  tigervnc/java/src/com/tigervnc/vncviewer/VncViewer.jar "dc475d72-124a-11e4-a53f-005056c00008"
 
 # this is for version 1.2
 #	ln -s ../newtigerpatches tigervnc/patches
