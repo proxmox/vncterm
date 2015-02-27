@@ -1,9 +1,9 @@
-RELEASE=3.2
+RELEASE=4.0
 
 PACKAGE=vncterm
 # Note: also change version in debian/control and debian/changelog
-VERSION=1.1
-PACKAGERELEASE=8
+VERSION=1.2
+PACKAGERELEASE=1
 ARCH:=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
 CDATE:=$(shell date +%F)
 
@@ -38,7 +38,7 @@ ${VNCLIB} vnc: ${VNCSRC}
 	cd ${VNCDIR}; make
 
 vncterm: vncterm.c glyphs.h ${VNCLIB}
-	gcc -O2 -g -o $@ vncterm.c -Wall -D_GNU_SOURCE -I ${VNCDIR} ${VNCLIB} -lnsl -lpthread -lz -ljpeg -lutil -lgnutls
+	gcc -O2 -g -o $@ vncterm.c -Wall -Wno-deprecated-declarations -D_GNU_SOURCE -I ${VNCDIR} ${VNCLIB} -lnsl -lpthread -lz -ljpeg -lutil -lgnutls
 
 jar: tigervnc.org
 	if test ! -f /usr/share/icedtea-web/plugin.jar; then echo "please install package icedtea-netx-common"; exit 1; fi

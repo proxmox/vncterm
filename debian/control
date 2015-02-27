@@ -1,8 +1,8 @@
 Package: vncterm
-Version: 1.1-8
+Version: 1.2-1
 Section: x11
 Priority: optional
-Depends: libc6 (>= 2.7-18), libjpeg62, zlib1g (>= 1:1.2.1), libvncserver0
+Depends: libc6 (>= 2.7-18), libjpeg62, zlib1g (>= 1:1.2.1),libgnutls-deb0-28
 Maintainer: Proxmox Support Team <support@proxmox.com>
 Description: VNC Terminal Emulator
  With vncterm you can start commands and export its standard input and
