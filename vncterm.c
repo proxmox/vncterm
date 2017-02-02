@@ -169,7 +169,7 @@ static void vnc_debug_gnutls_log(int level, const char* str) {
 }
 #endif
 
-#define DH_BITS 1024
+#define DH_BITS 2048
 static gnutls_dh_params_t dh_params;
 
 typedef struct {
