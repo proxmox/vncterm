@@ -494,42 +494,10 @@ rfbVncAuthVencrypt(rfbClientPtr cl)
 			return;
 		}
 
-		/* optimize for speed */
-		static const int cipher_priority_performance[] = {
-			GNUTLS_CIPHER_ARCFOUR_128,
-			GNUTLS_CIPHER_AES_128_CBC,
-			GNUTLS_CIPHER_3DES_CBC, 0
-		};
-
-		if ((ret = gnutls_cipher_set_priority(sd->session, cipher_priority_performance)) < 0) {
-			rfbLog("gnutls_cipher_set_priority failed: %s\n", gnutls_strerror(ret));
-			sd->session = NULL;
-			rfbCloseClient(cl);
-			return;
-		}
-
-		static const int kx_anon[] = {GNUTLS_KX_ANON_DH, 0};
-		static const int kx_x509[] = {GNUTLS_KX_DHE_DSS, GNUTLS_KX_RSA, GNUTLS_KX_DHE_RSA, GNUTLS_KX_SRP, 0};
-		if ((ret = gnutls_kx_set_priority(sd->session, use_x509 ? kx_x509 : kx_anon)) < 0) {
-			rfbLog("gnutls_kx_set_priority failed: %s\n", gnutls_strerror(ret));
-			sd->session = NULL;
-			rfbCloseClient(cl);
-			return;
-		}
-
-		static const int cert_type_priority[] = { GNUTLS_CRT_X509, 0 };
-		if ((ret = gnutls_certificate_type_set_priority(sd->session, cert_type_priority)) < 0) {
-			rfbLog("gnutls_certificate_type_set_priority failed: %s\n",
-			       gnutls_strerror(ret));
-			sd->session = NULL;
-			rfbCloseClient(cl);
-			return;
-		}
-
-		static const int protocol_priority[]= { GNUTLS_TLS1_1, GNUTLS_TLS1_0, GNUTLS_SSL3, 0 };
-		if ((ret = gnutls_protocol_set_priority(sd->session, protocol_priority)) < 0) {
-			rfbLog("gnutls_protocol_set_priority failed: %s\n",
-			       gnutls_strerror(ret));
+		static const char *priority_str_x509 = "NORMAL";
+		static const char *priority_str_anon = "NORMAL:+ANON-ECDH:+ANON-DH";
+		if ((ret = gnutls_priority_set_direct(sd->session, use_x509 ? priority_str_x509 : priority_str_anon, NULL)) < 0) {
+			rfbLog("gnutls_priority_set_direct failed: %s\n", gnutls_strerror(ret));
 			sd->session = NULL;
 			rfbCloseClient(cl);
 			return;
