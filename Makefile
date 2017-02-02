@@ -23,7 +23,8 @@ KEYSTORE=/home/dietmar/pve2-proxdev/proxmox-dev/comodo-for-java.keystore
 all: vncterm
 
 glyphs.h: genfont
-	./genfont > glyphs.h
+	./genfont > glyphs.h.tmp
+	mv glyphs.h.tmp glyphs.h
 
 genfont: genfont.c
 	gcc -g -O2 -o $@ genfont.c -Wall -D_GNU_SOURCE -lz
@@ -112,7 +113,7 @@ upload: ${DEB}
 
 .PHONY: clean
 clean:
-	rm -rf vncterm vncterm.1 vncterm_*.deb tigervnc *~ ${VNCDIR} vncterm-*.tar.gz
+	rm -rf vncterm vncterm.1 vncterm_*.deb tigervnc *~ ${VNCDIR} vncterm-*.tar.gz glyph.h.tmp
 
 .PHONY: distclean
 distclean: clean
