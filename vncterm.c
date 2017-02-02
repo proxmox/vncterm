@@ -256,7 +256,11 @@ tls_initialize_anon_cred(void)
 		return NULL;
 	}
 
+#if GNUTLS_VERSION_NUMBER >= 0x030506
+	gnutls_anon_set_server_known_dh_params(anon_cred, GNUTLS_SEC_PARAM_MEDIUM);
+#else
 	gnutls_anon_set_server_dh_params(anon_cred, dh_params);
+#endif
 
 	return anon_cred;
 }
@@ -290,8 +294,13 @@ tls_initialize_x509_cred(void)
 		gnutls_certificate_free_credentials(x509_cred);
 		return NULL;
 	}
-
+#if GNUTLS_VERSION_NUMBER >= 0x030506
+	/* only available since GnuTLS 3.5.6, on previous versions see
+	 * gnutls_certificate_set_dh_params(). */
+	gnutls_certificate_set_known_dh_params(x509_cred, GNUTLS_SEC_PARAM_MEDIUM);
+#else
 	gnutls_certificate_set_dh_params (x509_cred, dh_params);
+#endif
 
 	return x509_cred;
 }
