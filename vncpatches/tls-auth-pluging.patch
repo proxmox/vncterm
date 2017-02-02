@@ -1,14 +1,14 @@
 Index: vnc/libvncserver/auth.c
 ===================================================================
-@@ -270,8 +270,9 @@
+@@ -300,8 +300,9 @@
      int32_t securityType = rfbSecTypeInvalid;
  
      if (!cl->screen->authPasswdData || cl->reverseConnection) {
 -	/* chk if this condition is valid or not. */
 -	securityType = rfbSecTypeNone;
-+	    /* chk if this condition is valid or not. */
-+	    /* we disable anonymous auth */
-+	    // securityType = rfbSecTypeNone;
++	/* chk if this condition is valid or not. */
++	/* we disable anonymous auth */
++	// securityType = rfbSecTypeNone;
      } else if (cl->screen->authPasswdData) {
   	    securityType = rfbSecTypeVncAuth;
      }
@@ -17,29 +17,28 @@ Index: vnc/libvncserver/sockets.c
 ===================================================================
 --- vnc.orig/libvncserver/sockets.c	2011-01-20 16:42:41.000000000 +0100
 +++ vnc/libvncserver/sockets.c	2011-01-21 10:20:03.000000000 +0100
-@@ -454,8 +454,12 @@
-     fd_set fds;
-     struct timeval tv;
- 
-+
-     while (len > 0) {
+@@ -613,7 +613,11 @@ rfbReadExactTimeout(rfbClientPtr cl, char* buf, int len, int timeout)
+             n = read(sock, buf, len);
+         }
+ #else
 -        n = read(sock, buf, len);
-+	    if (cl->sock_read_fn)
-+		    n = cl->sock_read_fn(cl, buf, len);
-+	    else
-+		    n = read(sock, buf, len);
++	if (cl->sock_read_fn) {
++	    n = cl->sock_read_fn(cl, buf, len);
++	} else {
++	    n = read(sock, buf, len);
++	}
+ #endif
  
          if (n > 0) {
- 
-@@ -538,7 +542,10 @@
- 
-     LOCK(cl->outputMutex);
-     while (len > 0) {
--        n = write(sock, buf, len);
-+	if (cl->sock_write_fn)
+@@ -801,7 +805,11 @@ rfbWriteExact(rfbClientPtr cl,
+ 	    n = rfbssl_write(cl, buf, len);
+ 	else
+ #endif
++	if (cl->sock_write_fn) {
 +	    n = cl->sock_write_fn(cl, buf, len);
-+	else
-+	    n = write(sock, buf, len);
++	} else {
+ 	    n = write(sock, buf, len);
++	}
  
          if (n > 0) {
  
