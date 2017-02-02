@@ -7,9 +7,10 @@ PACKAGERELEASE=1
 ARCH:=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
 CDATE:=$(shell date +%F)
 
-VNCVER=0.9.7
-VNCDIR=LibVNCServer-${VNCVER}
-VNCSRC=${VNCDIR}.tar.gz
+VNCVER=0.9.11
+VNCREL=LibVNCServer-${VNCVER}
+VNCDIR=libvncserver-${VNCREL}
+VNCSRC=${VNCREL}.tar.gz
 VNCLIB=${VNCDIR}/libvncserver/.libs/libvncserver.a
 
 TIGERVNCSRC=tigervnc-1.1.0.tgz
@@ -35,11 +36,11 @@ ${VNCLIB} vnc: ${VNCSRC}
 	tar xf ${VNCSRC}
 	ln -s ../vncpatches ${VNCDIR}/patches
 	cd ${VNCDIR}; quilt push -a
-	cd ${VNCDIR}; ./configure; 
+	cd ${VNCDIR}; ./autogen.sh --without-ssl --without-websockets --without-tightvnc-filetransfer;
 	cd ${VNCDIR}; make
 
 vncterm: vncterm.c glyphs.h ${VNCLIB}
-	gcc -O2 -g -o $@ vncterm.c -Wall -Wno-deprecated-declarations -D_GNU_SOURCE -I ${VNCDIR} ${VNCLIB} -lnsl -lpthread -lz -ljpeg -lutil -lgnutls
+	gcc -O2 -g -o $@ vncterm.c -Wall -Wno-deprecated-declarations -D_GNU_SOURCE -I ${VNCDIR} ${VNCLIB} -lnsl -lpthread -lz -ljpeg -lutil -lgnutls -lpng
 
 jar: tigervnc.org
 	if test ! -f /usr/share/icedtea-web/plugin.jar; then echo "please install package icedtea-netx-common"; exit 1; fi
