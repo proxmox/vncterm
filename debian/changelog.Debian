@@ -1,3 +1,19 @@
+vncterm (1.3-1) unstable; urgency=low
+
+  * update cipher suites to GnuTLS's NORMAL
+
+  * allow building with GnuTLS 3.5
+
+  * update LibVNCServer to 0.9.11
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 3 Feb 2017 08:52:31 +0100
+
+vncterm (1.2-1) unstable; urgency=low
+
+  * recompile for Debian Jessie / PVE 4
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 27 Feb 2015 20:00:46 +0100
+
 vncterm (1.1-8) unstable; urgency=low
 
   * update applet signature (new code signing cert)
