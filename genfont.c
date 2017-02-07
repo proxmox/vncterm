@@ -84,7 +84,7 @@ load_psf_font (const char *filename, int is_default)
 {
   struct psf_header psfhdr;
  
-  gzFile *f = gzopen (filename, "rb");
+  gzFile f = gzopen(filename, "rb");
   if (f == NULL) {
 	  fprintf (stderr, "unable to read file %s\n", filename);
 	  exit(-1);
