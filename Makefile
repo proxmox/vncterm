@@ -96,8 +96,8 @@ ${DEB}:
 	install -m 0644 copyright dest/usr/share/doc/${PACKAGE}
 	install -m 0644 vncterm.1 dest/usr/share/man/man1
 	install -m 0644 debian/changelog.Debian dest/usr/share/doc/${PACKAGE}
-	gzip --best dest/usr/share/man/*/*
-	gzip --best dest/usr/share/doc/${PACKAGE}/changelog.Debian
+	gzip -n --best dest/usr/share/man/*/*
+	gzip -n --best dest/usr/share/doc/${PACKAGE}/changelog.Debian
 	dpkg-deb --build dest
 	mv dest.deb ${DEB}
 	rm -rf dest
