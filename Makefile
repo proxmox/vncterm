@@ -83,7 +83,8 @@ vncterm.1: vncterm.pod
 	pod2man -n $< -s 1 -r ${VERSION} <$< >$@
 
 .PHONY: deb
-${DEB} deb:
+deb: $(DEB)
+${DEB}:
 	make clean
 	rm -rf dest
 	mkdir dest
