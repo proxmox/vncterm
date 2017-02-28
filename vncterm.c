@@ -1354,6 +1354,7 @@ vncterm_putchar (vncTerm *vt, unicode ch)
       }
       break;
     } else if (ch == ';') {
+      vt->esc_has_par = 1;
       vt->esc_count++;
       break;
     } else {
