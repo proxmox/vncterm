@@ -107,7 +107,7 @@ upload: ${DEB}
 
 .PHONY: clean
 clean:
-	rm -rf vncterm vncterm.1 vncterm_*.deb tigervnc *~ ${VNCDIR} vncterm-*.tar.gz glyph.h.tmp
+	rm -rf vncterm vncterm.1 vncterm_*.deb genfont tigervnc *~ ${VNCDIR} vncterm-*.tar.gz glyph.h.tmp
 
 .PHONY: distclean
 distclean: clean
