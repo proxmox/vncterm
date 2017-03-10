@@ -11,13 +11,8 @@ VNCDIR=libvncserver-${VNCREL}
 VNCSRC=${VNCREL}.tar.gz
 VNCLIB=${VNCDIR}/libvncserver/.libs/libvncserver.a
 
-TIGERVNCSRC=tigervnc-1.1.0.tgz
-#TIGERVNCSRC=tigervnc-1.2.0.tgz
-
 DEB=${PACKAGE}_${VERSION}-${PACKAGERELEASE}_${ARCH}.deb
 SNAP=${PACKAGE}-${VERSION}-${CDATE}.tar.gz
-
-KEYSTORE=/home/dietmar/pve2-proxdev/proxmox-dev/comodo-for-java.keystore
 
 all: vncterm
 
@@ -40,37 +35,13 @@ ${VNCLIB} vnc: ${VNCSRC}
 vncterm: vncterm.c glyphs.h ${VNCLIB}
 	gcc -O2 -g -o $@ vncterm.c -Wall -Wno-deprecated-declarations -D_GNU_SOURCE -I ${VNCDIR} ${VNCLIB} -lnsl -lpthread -lz -ljpeg -lutil -lgnutls -lpng
 
-jar: tigervnc.org
-	if test ! -f /usr/share/icedtea-web/plugin.jar; then echo "please install package icedtea-netx-common"; exit 1; fi
-	rm -rf tigervnc VncViewer.jar
-	rsync -av --exclude .svn --exclude .svnignore  tigervnc.org/ tigervnc
-	ln -s ../tigerpatches tigervnc/patches
-	cd tigervnc; quilt push -a
-	cd tigervnc/java/src/com/tigervnc/vncviewer; make clean; make
-	jarsigner -keystore ${KEYSTORE} -signedjar VncViewer.jar  tigervnc/java/src/com/tigervnc/vncviewer/VncViewer.jar "dc475d72-124a-11e4-a53f-005056c00008"
-
-# this is for version 1.2
-#	ln -s ../newtigerpatches tigervnc/patches
-#	cd tigervnc/java;cmake -G "Unix Makefiles"; make
-#	jarsigner -keystore ${KEYSTORE} -signedjar VncViewer.jar  tigervnc/java/VncViewer.jar proxmox
-
-tigervnc.org: ${TIGERVNCSRC}
-	rm -rf tigervnc.org
-	tar xf ${TIGERVNCSRC}
-
-download:
-	rm -rf tigervnc.org
-	svn co https://tigervnc.svn.sourceforge.net/svnroot/tigervnc/tags/1_1_0 tigervnc.org 
-	tar cf ${TIGERVNCSRC} tigervnc.org
 
 .PHONY: install
-install: vncterm vncterm.1 VncViewer.jar
+install: vncterm vncterm.1
 	mkdir -p ${DESTDIR}/usr/share/doc/${PACKAGE}
 	mkdir -p ${DESTDIR}/usr/share/man/man1
 	mkdir -p ${DESTDIR}/usr/bin
 	install -s -m 0755 vncterm ${DESTDIR}/usr/bin
-	mkdir -p ${DESTDIR}/usr/share/vncterm/
-	install -m 0644 VncViewer.jar ${DESTDIR}/usr/share/vncterm/
 
 .PHONY: dinstall
 dinstall: ${DEB}
@@ -107,11 +78,10 @@ upload: ${DEB}
 
 .PHONY: clean
 clean:
-	rm -rf vncterm vncterm.1 vncterm_*.deb genfont tigervnc *~ ${VNCDIR} vncterm-*.tar.gz glyph.h.tmp
+	rm -rf vncterm vncterm.1 vncterm_*.deb genfont *~ ${VNCDIR} vncterm-*.tar.gz glyph.h.tmp
 
 .PHONY: distclean
 distclean: clean
-	rm -rf tigervnc.org
 
 .PHONY: dist
 ${SNAP} dist: distclean
