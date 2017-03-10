@@ -1,9 +1,7 @@
-RELEASE=4.0
-
 PACKAGE=vncterm
 # Note: also change version in debian/control and debian/changelog
 VERSION=1.3
-PACKAGERELEASE=1
+PACKAGERELEASE=2
 ARCH:=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
 CDATE:=$(shell date +%F)
 
@@ -105,7 +103,7 @@ ${DEB}:
 
 .PHONY: upload
 upload: ${DEB}
-	tar cf - ${DEB} | ssh repoman@repo.proxmox.com upload
+	tar cf - ${DEB} | ssh repoman@repo.proxmox.com -- upload --product pve --dist jessie
 
 .PHONY: clean
 clean:
