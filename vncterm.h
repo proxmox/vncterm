@@ -48,19 +48,19 @@ typedef struct vncTerm {
   // cursor
   TextAttributes cur_attrib;
   TextAttributes cur_attrib_saved;
-  int tty_state; // 0 - normal, 1 - ESC, 2 - CSI
+  unsigned int tty_state; // 0 - normal, 1 - ESC, 2 - CSI
   int cx; // cursor x position
   int cy; // cursor y position
   int cx_saved; // saved cursor x position
   int cy_saved; // saved cursor y position
-  int esc_buf[MAX_ESC_PARAMS];
-  int esc_count;
-  int esc_ques;
-  int esc_has_par;
+  unsigned int esc_buf[MAX_ESC_PARAMS];
+  unsigned int esc_count;
+  unsigned int esc_ques;
+  unsigned int esc_has_par;
   char osc_textbuf[4096];
   char osc_cmd;
-  int region_top;
-  int region_bottom;
+  unsigned int region_top;
+  unsigned int region_bottom;
 
   unsigned int charset:1; // G0 or G1
   unsigned int charset_saved:1; // G0 or G1
