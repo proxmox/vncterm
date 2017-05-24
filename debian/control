@@ -7,6 +7,7 @@ Build-Depends:
     libpng-dev,
     libglib2.0-dev,
     libgnutls28-dev,
+    unifont
 Standards-Version: 3.9.3
 
 Package: vncterm

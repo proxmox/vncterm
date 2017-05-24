@@ -24,6 +24,13 @@ glyphs.h: genfont
 genfont: genfont.c
 	gcc -g -O2 -o $@ genfont.c -Wall -D_GNU_SOURCE -lz
 
+font.data: genfont2
+	./genfont2 -o font.data.tmp -i /usr/share/unifont/unifont.hex
+	mv font.data.tmp font.data
+
+genfont2: genfont2.c
+	gcc -g -O2 -o $@ genfont2.c -Wall -Wextra -D_GNU_SOURCE -lz
+
 .PHONY: vnc
 ${VNCLIB} vnc: ${VNCSRC}
 	rm -rf ${VNCDIR}
@@ -70,7 +77,7 @@ upload: ${DEB}
 
 .PHONY: clean
 clean:
-	rm -rf vncterm vncterm.1 vncterm_*.deb genfont *~ ${VNCDIR} vncterm-*.tar.gz glyph.h.tmp build *.changes
+	rm -rf vncterm vncterm.1 vncterm_*.deb genfont genfont2 *~ ${VNCDIR} vncterm-*.tar.gz glyph.h.tmp build *.changes font.data.tmp font.data
 
 .PHONY: distclean
 distclean: clean
