@@ -1,9 +1,18 @@
+Source: vncterm
+Maintainer: Proxmox Support Team <support@proxmox.com>
+Build-Depends:
+    debhelper (>= 8.0.0),
+    zlib1g-dev,
+    libjpeg-dev,
+    libpng-dev,
+    libglib2.0-dev,
+    libgnutls28-dev,
+Standards-Version: 3.9.3
+
 Package: vncterm
-Version: 1.4-1
 Section: x11
 Priority: optional
-Depends: libc6 (>= 2.7-18), libjpeg62, zlib1g (>= 1:1.2.1), libgnutls-deb0-28 | libgnutls30, libpng16-16
-Maintainer: Proxmox Support Team <support@proxmox.com>
+Depends: libc6 (>= 2.7-18), libjpeg62, zlib1g (>= 1:1.2.1), libgnutls-deb0-28 | libgnutls30, libpng16-16, ${shlibs:Depends}
 Description: VNC Terminal Emulator
  With vncterm you can start commands and export its standard input and
  output to any VNC client (simulating a xterm Terminal).

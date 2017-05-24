@@ -3,6 +3,7 @@ PACKAGE=vncterm
 VERSION=1.4
 PACKAGERELEASE=2
 ARCH:=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
+GITVERSION:=$(shell cat .git/refs/heads/master)
 CDATE:=$(shell date +%F)
 
 VNCVER=0.9.11
@@ -39,7 +40,9 @@ vncterm: vncterm.c glyphs.h ${VNCLIB}
 .PHONY: install
 install: vncterm vncterm.1
 	mkdir -p ${DESTDIR}/usr/share/doc/${PACKAGE}
+	install -m 0644 copyright ${DESTDIR}/usr/share/doc/${PACKAGE}
 	mkdir -p ${DESTDIR}/usr/share/man/man1
+	install -m 0644 vncterm.1 ${DESTDIR}/usr/share/man/man1
 	mkdir -p ${DESTDIR}/usr/bin
 	install -s -m 0755 vncterm ${DESTDIR}/usr/bin
 
@@ -55,21 +58,10 @@ vncterm.1: vncterm.pod
 deb: $(DEB)
 ${DEB}:
 	make clean
-	rm -rf dest
-	mkdir dest
-	make DESTDIR=`pwd`/dest install
-	install -d -m 0755 dest/DEBIAN
-	install -m 0644 debian/control dest/DEBIAN
-	echo "Architecture: ${ARCH}" >>dest/DEBIAN/control
-	install -m 0644 debian/conffiles dest/DEBIAN
-	install -m 0644 copyright dest/usr/share/doc/${PACKAGE}
-	install -m 0644 vncterm.1 dest/usr/share/man/man1
-	install -m 0644 debian/changelog.Debian dest/usr/share/doc/${PACKAGE}
-	gzip -n --best dest/usr/share/man/*/*
-	gzip -n --best dest/usr/share/doc/${PACKAGE}/changelog.Debian
-	fakeroot dpkg-deb --build dest
-	mv dest.deb ${DEB}
-	rm -rf dest
+	rsync -a . --exclude build build
+	echo "Architecture: ${ARCH}" >> build/debian/control
+	echo "git clone git://git.proxmox.com/git/vncterm.git\\ngit checkout ${GIVERSION}" > build/debian/SOURCE
+	cd build; dpkg-buildpackage -rfakeroot -b -us -uc
 	lintian ${DEB}	
 
 .PHONY: upload
@@ -78,7 +70,7 @@ upload: ${DEB}
 
 .PHONY: clean
 clean:
-	rm -rf vncterm vncterm.1 vncterm_*.deb genfont *~ ${VNCDIR} vncterm-*.tar.gz glyph.h.tmp
+	rm -rf vncterm vncterm.1 vncterm_*.deb genfont *~ ${VNCDIR} vncterm-*.tar.gz glyph.h.tmp build *.changes
 
 .PHONY: distclean
 distclean: clean
