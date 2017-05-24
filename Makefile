@@ -17,13 +17,6 @@ SNAP=${PACKAGE}-${VERSION}-${CDATE}.tar.gz
 
 all: vncterm
 
-glyphs.h: genfont
-	./genfont > glyphs.h.tmp
-	mv glyphs.h.tmp glyphs.h
-
-genfont: genfont.c
-	gcc -g -O2 -o $@ genfont.c -Wall -D_GNU_SOURCE -lz
-
 font.data: genfont2
 	./genfont2 -o font.data.tmp -i /usr/share/unifont/unifont.hex
 	mv font.data.tmp font.data
@@ -40,14 +33,18 @@ ${VNCLIB} vnc: ${VNCSRC}
 	cd ${VNCDIR}; ./autogen.sh --without-ssl --without-websockets --without-tightvnc-filetransfer;
 	cd ${VNCDIR}; make
 
-vncterm: vncterm.c glyphs.h ${VNCLIB}
-	gcc -O2 -g -o $@ vncterm.c -Wall -Wno-deprecated-declarations -D_GNU_SOURCE -I ${VNCDIR} ${VNCLIB} -lnsl -lpthread -lz -ljpeg -lutil -lgnutls -lpng
+vncterm: vncterm.c ${VNCLIB} wchardata.c
+	gcc -O2 -g -o $@ vncterm.c wchardata.c -Wall -Wno-deprecated-declarations -D_GNU_SOURCE -I ${VNCDIR} ${VNCLIB} -lnsl -lpthread -lz -ljpeg -lutil -lgnutls -lpng
 
+wchardata.c:
+	cp /usr/share/unifont/$@ $@
 
 .PHONY: install
-install: vncterm vncterm.1
+install: vncterm vncterm.1 font.data
 	mkdir -p ${DESTDIR}/usr/share/doc/${PACKAGE}
 	install -m 0644 copyright ${DESTDIR}/usr/share/doc/${PACKAGE}
+	mkdir -p ${DESTDIR}/usr/share/${PACKAGE}
+	install -m 0644 font.data ${DESTDIR}/usr/share/${PACKAGE}
 	mkdir -p ${DESTDIR}/usr/share/man/man1
 	install -m 0644 vncterm.1 ${DESTDIR}/usr/share/man/man1
 	mkdir -p ${DESTDIR}/usr/bin
@@ -77,7 +74,7 @@ upload: ${DEB}
 
 .PHONY: clean
 clean:
-	rm -rf vncterm vncterm.1 vncterm_*.deb genfont genfont2 *~ ${VNCDIR} vncterm-*.tar.gz glyph.h.tmp build *.changes font.data.tmp font.data
+	rm -rf vncterm vncterm.1 vncterm_*.deb genfont genfont2 *~ ${VNCDIR} vncterm-*.tar.gz glyph.h.tmp build *.changes wchardata.c font.data.tmp font.data *.buildinfo
 
 .PHONY: distclean
 distclean: clean

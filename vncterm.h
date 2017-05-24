@@ -17,6 +17,8 @@ typedef struct TextAttributes {
 
 typedef struct TextCell {
   unicode ch;
+  unicode combiningglyph;
+  short width;
   TextAttributes attrib;
 } TextCell;
 

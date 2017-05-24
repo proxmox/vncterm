@@ -26,6 +26,9 @@
 #include <stdlib.h>
 #include <sys/types.h> 
 #include <sys/socket.h>
+#include <sys/stat.h>
+#include <sys/mman.h>
+#include <fcntl.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <rfb/rfb.h>
@@ -39,7 +42,6 @@
 #include <locale.h>
 
 #include "vncterm.h"
-#include "glyphs.h"
 
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
@@ -54,6 +56,12 @@ uint16_t screen_width = 744;
 uint16_t screen_height = 400;
 
 int use_x509 = 1;
+
+extern int wcwidth (wchar_t wc);
+unsigned char *fontdata;
+
+#define FONTFILE "/usr/share/vncterm/font.data"
+#define GLYPHLINES 16
 
 static char *
 urlencode(char *buf, const char *value)
@@ -629,21 +637,16 @@ ucs2_to_utf8 (unicode c, char *out)
 
 static void
 rfb_draw_char (rfbScreenInfoPtr rfbScreen, int x, int y,
-	       unsigned short c, rfbPixel col)
+	       unicode c, rfbPixel col, short width)
 {
-  if (c > vt_font_size) {
-    rfbLog ("undefined font glyph %d\n", c);
-    return;
-  }
-
   int i,j;
-  unsigned char *data= vt_font_data + c*16;
+  unsigned char *data= fontdata + c*(GLYPHLINES*2);
   unsigned char d=*data;
   int rowstride=rfbScreen->paddedWidthInBytes;
   char *colour=(char*)&col;
 
-  for(j = 0; j < 16; j++) {
-    for(i = 0; i < 8; i++) {
+  for(j = 0; j < GLYPHLINES; j++) {
+    for(i = 0; i < 8*width; i++) {
       if ((i&7) == 0) {
 	d=*data;
 	data++;
@@ -656,13 +659,16 @@ rfb_draw_char (rfbScreenInfoPtr rfbScreen, int x, int y,
 }
 
 static void
-draw_char_at (vncTerm *vt, int x, int y, unicode ch, TextAttributes attrib)
+draw_char_at (vncTerm *vt, int x, int y, unicode ch, TextAttributes attrib, short width, unicode combiningglyph)
 {
   if (x < 0 || y < 0 || x >= vt->width || y >= vt->height) { return; }
 
+  // non printable character
+  if (width < 1) return;
+
   int rx = x*8;
   int ry = y*16;
-  int rxe = x*8+8;
+  int rxe = x*8+8*width;
   int rye = y*16+16;
 
   int fg, bg;
@@ -675,8 +681,6 @@ draw_char_at (vncTerm *vt, int x, int y, unicode ch, TextAttributes attrib)
     fg = attrib.fgcol;
   }
 
-  int ec = vt_fontmap[ch];
-
   rfbFillRect (vt->screen, rx, ry, rxe, rye, bg);
 
   if (attrib.bold) {
@@ -685,7 +689,11 @@ draw_char_at (vncTerm *vt, int x, int y, unicode ch, TextAttributes attrib)
 
   // unsuported attributes = (attrib.blink || attrib.unvisible)
 
-  rfb_draw_char (vt->screen, rx, ry, ec, fg);
+  rfb_draw_char (vt->screen, rx, ry, ch, fg, width);
+
+  if (combiningglyph) {
+      rfb_draw_char (vt->screen, rx, ry, combiningglyph, fg, 1);
+  }
 
   if (attrib.uline) {
     rfbDrawLine (vt->screen, rx, ry + 14, rxe, ry + 14, fg);
@@ -707,7 +715,7 @@ vncterm_update_xy (vncTerm *vt, int x, int y)
   }
   if (y2 < vt->height) {
     TextCell *c = &vt->cells[y1 * vt->width + x];
-    draw_char_at (vt, x, y2, c->ch, c->attrib);
+    draw_char_at (vt, x, y2, c->ch, c->attrib, c->width, c->combiningglyph);
   }
 }
 
@@ -727,8 +735,10 @@ vncterm_clear_xy (vncTerm *vt, int x, int y)
     c->attrib = vt->default_attrib;
     c->attrib.fgcol = vt->cur_attrib.fgcol;
     c->attrib.bgcol = vt->cur_attrib.bgcol;
+    c->width = 1;
+    c->combiningglyph = 0;
 
-    draw_char_at (vt, x, y, c->ch, c->attrib);
+    draw_char_at (vt, x, y, c->ch, c->attrib, c->width, c->combiningglyph);
   }
 }
 
@@ -753,9 +763,9 @@ vncterm_show_cursor (vncTerm *vt, int show)
     if (show) {
       TextAttributes attrib = vt->default_attrib;
       attrib.invers = !(attrib.invers); /* invert fg and bg */
-      draw_char_at (vt, x, y, c->ch, attrib);
+      draw_char_at (vt, x, y, c->ch, attrib, c->width, c->combiningglyph);
     } else {
-      draw_char_at (vt, x, y, c->ch, c->attrib);
+      draw_char_at (vt, x, y, c->ch, c->attrib, c->width, c->combiningglyph);
     }
   }
 }
@@ -771,8 +781,8 @@ vncterm_refresh (vncTerm *vt)
   for(y = 0; y < vt->height; y++) {
     TextCell *c = vt->cells + y1 * vt->width;
     for(x = 0; x < vt->width; x++) {
-      draw_char_at (vt, x, y, c->ch, c->attrib);
-      c++;
+      draw_char_at (vt, x, y, c->ch, c->attrib, c->width, c->combiningglyph);
+      c += c->width;
     }
     if (++y1 == vt->total_height)
       y1 = 0;
@@ -821,6 +831,8 @@ vncterm_scroll_down (vncTerm *vt, int top, int bottom, int lines)
     for(j = 0; j < vt->width; j++) {
       c->attrib = vt->default_attrib;
       c->ch = ' ';
+      c->width = 1;
+      c->combiningglyph = 0;
       c++;
     }
   }
@@ -870,6 +882,8 @@ vncterm_scroll_up (vncTerm *vt, int top, int bottom, int lines, int moveattr)
     for(j = 0; j < vt->width; j++) {
       c->attrib = vt->default_attrib;
       c->ch = ' ';
+      c->width = 1;
+      c->combiningglyph = 0;
       c++;
     }
   }
@@ -954,6 +968,8 @@ vncterm_put_lf (vncTerm *vt)
     int x;
     for (x = 0; x < vt->width; x++) {
       c->ch = ' ';
+      c->width = 1;
+      c->combiningglyph = 0;
       c->attrib = vt->default_attrib;
       c++;
     }
@@ -1176,9 +1192,7 @@ vncterm_gotoxy (vncTerm *vt, int x, int y)
 
   if (x < 0) {
     x = 0;
-  }
-
-  if (x >= vt->width) {
+  } else if (x >= vt->width) {
     x = vt->width - 1;
   }
 
@@ -1186,9 +1200,7 @@ vncterm_gotoxy (vncTerm *vt, int x, int y)
 
   if (y < 0) {
     y = 0;
-  }
-
-  if (y >= vt->height) {
+  } else if (y >= vt->height) {
     y = vt->height - 1;
   }
 
@@ -1553,6 +1565,8 @@ vncterm_putchar (vncTerm *vt, unicode ch)
 	*dst = *src;
 	vncterm_update_xy (vt, x + c, vt->cy);
 	src->ch = ' ';
+	src->width = 1;
+	src->combiningglyph = 0;
 	src->attrib = vt->default_attrib;
 	vncterm_update_xy (vt, x, vt->cy);
       }
@@ -1591,6 +1605,8 @@ vncterm_putchar (vncTerm *vt, unicode ch)
 	*dst = *src;
 	vncterm_update_xy (vt, x + c, vt->cy);
 	src->ch = ' ';
+	src->width = 1;
+	src->combiningglyph = 0;
 	src->attrib = vt->cur_attrib;
 	vncterm_update_xy (vt, x, vt->cy);
       }
@@ -1746,11 +1762,25 @@ vncterm_putchar (vncTerm *vt, unicode ch)
       }
 
       int y1 = (vt->y_base + vt->cy) % vt->total_height;
-      TextCell *c = &vt->cells[y1*vt->width + vt->cx];
-      c->attrib = vt->cur_attrib;
-      c->ch = ch;
-      vncterm_update_xy (vt, vt->cx, vt->cy);
-      vt->cx++;
+      int width = wcwidth(ch);
+      if (width > 0) {
+	  // normal/wide character
+	  TextCell *c = &vt->cells[y1*vt->width + vt->cx];
+	  c->attrib = vt->cur_attrib;
+	  c->ch = ch;
+	  c->width = width;
+	  c->combiningglyph = 0;
+	  vncterm_update_xy (vt, vt->cx, vt->cy);
+	  vt->cx += width;
+      } else if (width == 0) {
+	  // combiningglyph
+	  TextCell *c = &vt->cells[y1*vt->width + vt->cx - 1];
+	  c->attrib = vt->cur_attrib;
+	  c->combiningglyph = ch;
+	  vncterm_update_xy (vt, vt->cx - 1, vt->cy);
+      } else {
+	  // non printable character, so we do not save them
+      }
       break;
     }
     break;
@@ -2270,6 +2300,8 @@ main (int argc, char** argv)
   int i;
   char **cmdargv = NULL;
   char *command = "/bin/bash"; // execute normal shell as default
+  int fontfd;
+  struct stat sb;
   int pid;
   int master;
   char ptyname[1024];
@@ -2353,6 +2385,23 @@ main (int argc, char** argv)
   rfbLogEnable (0);
 #endif
 
+  // mmap font file
+  fontfd = open(FONTFILE, O_RDONLY);
+  if (fontfd == -1) {
+    perror("Error opening Fontfile 'FONTFILE'");
+    exit (-1);
+  }
+  if (fstat(fontfd, &sb) == -1) {
+    perror("Stat on 'FONTFILE' failed");
+    exit (-1);
+  }
+  fontdata = mmap(NULL, sb.st_size, PROT_READ, MAP_SHARED, fontfd, 0);
+  if (fontdata == MAP_FAILED) {
+    perror("Could not mmap 'FONTFILE'");
+    exit (-1);
+  }
+
+  close(fontfd);
   vncTerm *vt = create_vncterm (argc, argv, screen_width, screen_height);
 
   setlocale(LC_ALL, ""); // set from environment
@@ -2453,9 +2502,12 @@ main (int argc, char** argv)
     }
   }
 
+  rfbScreenCleanup(vt->screen);
+
   kill (pid, 9);
   int status;
   waitpid(pid, &status, 0);
 
+  munmap(fontdata, sb.st_size);
   exit (0);
 }
