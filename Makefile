@@ -25,13 +25,14 @@ genfont2: genfont2.c
 	gcc -g -O2 -o $@ genfont2.c -Wall -Wextra -D_GNU_SOURCE -lz
 
 .PHONY: vnc
-${VNCLIB} vnc: ${VNCSRC}
+vnc: ${VNCLIB}
+${VNCLIB}: ${VNCSRC}
 	rm -rf ${VNCDIR}
 	tar xf ${VNCSRC}
 	ln -s ../vncpatches ${VNCDIR}/patches
 	cd ${VNCDIR}; quilt push -a
 	cd ${VNCDIR}; ./autogen.sh --without-ssl --without-websockets --without-tightvnc-filetransfer;
-	cd ${VNCDIR}; make
+	cd ${VNCDIR}; $(MAKE)
 
 vncterm: vncterm.c ${VNCLIB} wchardata.c
 	gcc -O2 -g -o $@ vncterm.c wchardata.c -Wall -Wno-deprecated-declarations -D_GNU_SOURCE -I ${VNCDIR} ${VNCLIB} -lnsl -lpthread -lz -ljpeg -lutil -lgnutls -lpng
@@ -61,7 +62,7 @@ vncterm.1: vncterm.pod
 .PHONY: deb
 deb: $(DEB)
 ${DEB}:
-	make clean
+	$(MAKE) clean
 	rsync -a . --exclude build build
 	echo "Architecture: ${ARCH}" >> build/debian/control
 	echo "git clone git://git.proxmox.com/git/vncterm.git\\ngit checkout ${GIVERSION}" > build/debian/SOURCE
