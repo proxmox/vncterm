@@ -1,3 +1,13 @@
+vncterm (1.5-1) unstable; urgency=medium
+
+  * use unifont to support more glyphs (range 0x0000..0xFFFF)
+
+  * support wide characters
+
+  * support combining glyphs
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 24 May 2017 13:12:55 +0200
+
 vncterm (1.4-2) unstable; urgency=medium
 
   * fix bound checking on cursor move
