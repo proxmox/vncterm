@@ -50,6 +50,9 @@
 char *auth_path = "/";
 char *auth_perm = "Sys.Console";
 
+uint16_t screen_width = 744;
+uint16_t screen_height = 400;
+
 int use_x509 = 1;
 
 static char *
@@ -2274,6 +2277,8 @@ main (int argc, char** argv)
   struct timeval tv, tv1;
   time_t elapsed, cur_time;
   struct winsize dimensions;
+  unsigned long width = 0;
+  unsigned long height = 0;
 
   if (gnutls_global_init () < 0) {
 	  fprintf(stderr, "gnutls_global_init failed\n");
@@ -2313,6 +2318,22 @@ main (int argc, char** argv)
       CHECK_ARGC (argc, argv, i);
       auth_perm = argv[i+1];
       rfbPurgeArguments(&argc, &i, 2, argv); i--;
+    } else if (!strcmp (argv[i], "-width")) {
+      CHECK_ARGC (argc, argv, i);
+      errno = 0;
+      width = strtoul(argv[i+1], NULL, 10);
+      if (errno == 0 && width >= 16 && width < 0xFFFF) {
+	screen_width = width;
+      }
+      rfbPurgeArguments(&argc, &i, 2, argv); i--;
+    } else if (!strcmp (argv[i], "-height")) {
+      CHECK_ARGC (argc, argv, i);
+      errno = 0;
+      height = strtoul(argv[i+1], NULL, 10);
+      if (errno == 0 && height >= 32 && height < 0xFFFF) {
+	screen_height = height;
+      }
+      rfbPurgeArguments(&argc, &i, 2, argv); i--;
     } else if (!strcmp (argv[i], "-notls")) {
         rfbPurgeArguments(&argc, &i, 1, argv); i--;
         if ((vncticket = getenv("PVE_VNC_TICKET")) == NULL) {
@@ -2332,7 +2353,7 @@ main (int argc, char** argv)
   rfbLogEnable (0);
 #endif
 
-  vncTerm *vt = create_vncterm (argc, argv, 745, 400);
+  vncTerm *vt = create_vncterm (argc, argv, screen_width, screen_height);
 
   setlocale(LC_ALL, ""); // set from environment
 
