@@ -2201,6 +2201,63 @@ new_client (rfbClientPtr client)
 
 static char *vncticket = NULL;
 
+static void
+MakeRichCursor(rfbScreenInfoPtr rfbScreen)
+{
+  int w = 16,
+      h = 16;
+  rfbCursorPtr c = rfbScreen->cursor;
+  char bitmap[] =
+      "                "
+      " x              "
+      " xx             "
+      " xxx            "
+      " xxxx           "
+      " xxxxx          "
+      " xxxxxx         "
+      " xxxxxxx        "
+      " xxxxxxxx       "
+      " xxxxxxxxx      "
+      " xxxxxxxxxx     "
+      " xxxx           "
+      " xxx            "
+      " xx             "
+      " x              "
+      "                ";
+  char edge[] =
+      "                "
+      " x              "
+      " xx             "
+      " x x            "
+      " x  x           "
+      " x   x          "
+      " x    x         "
+      " x     x        "
+      " x      x       "
+      " x       x      "
+      " x   xxxxxx     "
+      " x  x           "
+      " x x            "
+      " xx             "
+      " x              "
+      "                ";
+
+  c = rfbScreen->cursor = rfbMakeXCursor(w,h,bitmap,bitmap);
+  c->richSource = (unsigned char*)calloc(w*h, 1);
+  c->cleanupRichSource = TRUE;
+
+  for(int j=0;j<h;j++) {
+    for(int i=0;i<w;i++) {
+      unsigned int pos = j*w+i;
+      if (edge[pos] == 'x') {
+	c->richSource[pos] = 15; // white
+      } else {
+	c->richSource[pos] = 0;  // black
+      }
+    }
+  }
+}
+
 vncTerm *
 create_vncterm (int argc, char** argv, int maxx, int maxy)
 {
@@ -2208,6 +2265,7 @@ create_vncterm (int argc, char** argv, int maxx, int maxy)
 
   rfbScreenInfoPtr screen = rfbGetScreen (&argc, argv, maxx, maxy, 8, 1, 1);
   screen->frameBuffer=(char*)calloc(maxx*maxy, 1);
+  MakeRichCursor(screen);
 
   char **passwds = calloc(sizeof(char**), 2);
 
