@@ -1,7 +1,7 @@
 PACKAGE=vncterm
 # Note: also change version in debian/control and debian/changelog
 VERSION=1.5
-PACKAGERELEASE=1
+PACKAGERELEASE=2
 ARCH:=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
 GITVERSION:=$(shell cat .git/refs/heads/master)
 CDATE:=$(shell date +%F)
