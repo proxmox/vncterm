@@ -1,3 +1,9 @@
+vncterm (1.5-3) unstable; urgency=medium
+
+  * depend on libjpeg62-turbo instead of libjpeg62
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 15 Nov 2017 12:46:19 +0100
+
 vncterm (1.5-2) unstable; urgency=medium
 
   * replaced pure plack cursor with a more visible pointer with white edges
