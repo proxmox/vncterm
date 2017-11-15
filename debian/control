@@ -3,7 +3,7 @@ Maintainer: Proxmox Support Team <support@proxmox.com>
 Build-Depends: debhelper (>= 8.0.0),
                libglib2.0-dev,
                libgnutls28-dev,
-               libjpeg-dev,
+               libjpeg62-turbo-dev,
                libpng-dev,
                unifont,
                zlib1g-dev,
@@ -14,7 +14,7 @@ Section: x11
 Priority: optional
 Depends: libc6 (>= 2.7-18),
          libgnutls-deb0-28 | libgnutls30,
-         libjpeg62,
+         libjpeg62-turbo,
          libpng16-16,
          zlib1g (>= 1:1.2.1),
          ${shlibs:Depends},
