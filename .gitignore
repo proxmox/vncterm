@@ -1,4 +1,8 @@
 build/
+vncterm
+libvncserver-LibVNCServer-0.9.11/
+# wchardata.c is copied from unifont (/usr/share/unifont/wchardata.c)
+wchardata.c
 *.deb
 *.buildinfo
 *.changes
