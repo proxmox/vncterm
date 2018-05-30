@@ -15,6 +15,10 @@ VNCLIB=${VNCDIR}/libvncserver/.libs/libvncserver.a
 DEB=${PACKAGE}_${VERSION}-${PACKAGERELEASE}_${ARCH}.deb
 SNAP=${PACKAGE}-${VERSION}-${CDATE}.tar.gz
 
+CPPFLAGS += -O2 -g -Wall -Wno-deprecated-declarations -D_GNU_SOURCE -I $(VNCDIR)
+
+VNC_LIBS := -lnsl -lpthread -lz -ljpeg -lutil -lgnutls -lpng
+
 all: vncterm
 
 font.data: genfont2
@@ -34,8 +38,8 @@ ${VNCLIB}: ${VNCSRC}
 	cd ${VNCDIR}; ./autogen.sh --without-ssl --without-websockets --without-tightvnc-filetransfer;
 	cd ${VNCDIR}; $(MAKE)
 
-vncterm: vncterm.c ${VNCLIB} wchardata.c
-	gcc -O2 -g -o $@ vncterm.c wchardata.c -Wall -Wno-deprecated-declarations -D_GNU_SOURCE -I ${VNCDIR} ${VNCLIB} -lnsl -lpthread -lz -ljpeg -lutil -lgnutls -lpng
+vncterm: vncterm.c wchardata.c $(VNCLIB)
+	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ $^ $(VNC_LIBS)
 
 wchardata.c:
 	cp /usr/share/unifont/$@ $@
