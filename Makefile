@@ -4,7 +4,6 @@ VERSION=1.5
 PACKAGERELEASE=3
 ARCH:=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
 GITVERSION:=$(shell cat .git/refs/heads/master)
-CDATE:=$(shell date +%F)
 
 VNCVER=0.9.11
 VNCREL=LibVNCServer-${VNCVER}
@@ -13,7 +12,6 @@ VNCSRC=${VNCREL}.tar.gz
 VNCLIB=${VNCDIR}/libvncserver/.libs/libvncserver.a
 
 DEB=${PACKAGE}_${VERSION}-${PACKAGERELEASE}_${ARCH}.deb
-SNAP=${PACKAGE}-${VERSION}-${CDATE}.tar.gz
 
 CPPFLAGS += -O2 -g -Wall -Wno-deprecated-declarations -D_GNU_SOURCE -I $(VNCDIR)
 
@@ -82,13 +80,3 @@ clean:
 
 .PHONY: distclean
 distclean: clean
-
-.PHONY: dist
-${SNAP} dist: distclean
-	rm -rf ../${SNAP}
-	cd ..; tar cvzf ${SNAP} --exclude .svn ${PACKAGE}
-	mv ../${SNAP} ${SNAP}
-
-.PHONY: uploaddist
-uploaddist: ${SNAP}
-	scp ${SNAP} pve.proxmox.com:/home/ftp/sources/
