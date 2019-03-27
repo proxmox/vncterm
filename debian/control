@@ -10,6 +10,7 @@ Build-Depends: debhelper (>= 8.0.0),
 Standards-Version: 3.9.3
 
 Package: vncterm
+Architecture: any
 Section: x11
 Priority: optional
 Depends: libc6 (>= 2.7-18),

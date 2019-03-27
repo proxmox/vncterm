@@ -68,7 +68,6 @@ deb: $(DEB)
 ${DEB}:
 	$(MAKE) clean
 	rsync -a . --exclude build build
-	echo "Architecture: ${ARCH}" >> build/debian/control
 	echo "git clone git://git.proxmox.com/git/vncterm.git\\ngit checkout ${GIVERSION}" > build/debian/SOURCE
 	cd build; dpkg-buildpackage -rfakeroot -b -us -uc
 	lintian ${DEB}	
