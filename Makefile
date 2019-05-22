@@ -1,8 +1,7 @@
+include /usr/share/dpkg/pkg-info.mk
+include /usr/share/dpkg/architecture.mk
+
 PACKAGE=vncterm
-# Note: also change version in debian/control and debian/changelog
-VERSION=1.5
-PACKAGERELEASE=3
-ARCH:=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
 GITVERSION:=$(shell cat .git/refs/heads/master)
 
 VNCVER=0.9.11
@@ -11,7 +10,7 @@ VNCDIR=libvncserver-${VNCREL}
 VNCSRC=${VNCREL}.tar.gz
 VNCLIB=${VNCDIR}/libvncserver/.libs/libvncserver.a
 
-DEB=${PACKAGE}_${VERSION}-${PACKAGERELEASE}_${ARCH}.deb
+DEB=${PACKAGE}_${DEB_VERSION_UPSTREAM_REVISION}_${DEB_BUILD_ARCH}.deb
 
 CPPFLAGS += -O2 -g -Wall -Wno-deprecated-declarations -D_GNU_SOURCE -I $(VNCDIR)
 
@@ -59,7 +58,7 @@ dinstall: ${DEB}
 
 vncterm.1: vncterm.pod
 	rm -f $@
-	pod2man -n $< -s 1 -r ${VERSION} <$< >$@
+	pod2man -n $< -s 1 -r ${DEB_VERSION_UPSTREAM} <$< >$@
 
 .PHONY: deb
 deb: $(DEB)
@@ -68,7 +67,7 @@ ${DEB}:
 	rsync -a . --exclude build build
 	echo "git clone git://git.proxmox.com/git/vncterm.git\\ngit checkout ${GIVERSION}" > build/debian/SOURCE
 	cd build; dpkg-buildpackage -rfakeroot -b -us -uc
-	lintian ${DEB}	
+	lintian ${DEB}
 
 .PHONY: upload
 upload: ${DEB}
