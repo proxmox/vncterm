@@ -1,6 +1,6 @@
 Source: vncterm
 Maintainer: Proxmox Support Team <support@proxmox.com>
-Build-Depends: debhelper (>= 8.0.0),
+Build-Depends: debhelper (>= 10~),
                libglib2.0-dev,
                libgnutls28-dev,
                libjpeg62-turbo-dev,
@@ -9,7 +9,7 @@ Build-Depends: debhelper (>= 8.0.0),
                tar,
                unifont,
                zlib1g-dev,
-Standards-Version: 3.9.3
+Standards-Version: 4.1.3
 
 Package: vncterm
 Architecture: any
