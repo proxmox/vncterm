@@ -4,11 +4,11 @@ include /usr/share/dpkg/architecture.mk
 PACKAGE=vncterm
 GITVERSION:=$(shell cat .git/refs/heads/master)
 
-VNCVER=0.9.11
+VNCVER=0.9.13
 VNCREL=LibVNCServer-${VNCVER}
 VNCDIR=libvncserver-${VNCREL}
 VNCSRC=${VNCREL}.tar.gz
-VNCLIB=${VNCDIR}/libvncserver/.libs/libvncserver.a
+VNCLIB=${VNCDIR}/libvncserver.a
 
 DEB=${PACKAGE}_${DEB_VERSION_UPSTREAM_REVISION}_${DEB_BUILD_ARCH}.deb
 
@@ -32,8 +32,7 @@ ${VNCLIB}: ${VNCSRC}
 	tar xf ${VNCSRC}
 	ln -s ../vncpatches ${VNCDIR}/patches
 	cd ${VNCDIR}; quilt push -a
-	cd ${VNCDIR}; ./autogen.sh --without-ssl --without-websockets --without-tightvnc-filetransfer;
-	cd ${VNCDIR}; $(MAKE)
+	cd ${VNCDIR}; cmake -D WITH_GNUTLS=OFF -D WITH_OPENSSL=OFF -D WITH_WEBSOCKETS=OFF -D WITH_SYSTEMD=OFF -D WITH_TIGHTVNC_FILETRANSFER=OFF -D WITH_GCRYPT=OFF -D WITH_LZO=OFF -D BUILD_SHARED_LIBS=OFF .; cmake --build .
 
 vncterm: vncterm.c wchardata.c $(VNCLIB)
 	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ $^ $(VNC_LIBS)

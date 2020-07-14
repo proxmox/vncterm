@@ -1,6 +1,7 @@
 Source: vncterm
 Maintainer: Proxmox Support Team <support@proxmox.com>
-Build-Depends: debhelper (>= 10~),
+Build-Depends: cmake,
+               debhelper (>= 10~),
                libglib2.0-dev,
                libgnutls28-dev,
                libjpeg62-turbo-dev,

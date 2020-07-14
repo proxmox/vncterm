@@ -1,23 +1,22 @@
-Index: vnc/libvncserver/auth.c
+Index: libvncserver-LibVNCServer-0.9.13/libvncserver/auth.c
 ===================================================================
-@@ -300,8 +300,9 @@
-     int32_t securityType = rfbSecTypeInvalid;
+--- libvncserver-LibVNCServer-0.9.13.orig/libvncserver/auth.c
++++ libvncserver-LibVNCServer-0.9.13/libvncserver/auth.c
+@@ -301,7 +301,8 @@ rfbAuthNewClient(rfbClientPtr cl)
  
      if (!cl->screen->authPasswdData || cl->reverseConnection) {
--	/* chk if this condition is valid or not. */
+ 	/* chk if this condition is valid or not. */
 -	securityType = rfbSecTypeNone;
-+	/* chk if this condition is valid or not. */
 +	/* we disable anonymous auth */
 +	// securityType = rfbSecTypeNone;
      } else if (cl->screen->authPasswdData) {
   	    securityType = rfbSecTypeVncAuth;
      }
-Index: vnc/newterm/Makefile.am
-Index: vnc/libvncserver/sockets.c
+Index: libvncserver-LibVNCServer-0.9.13/libvncserver/sockets.c
 ===================================================================
---- vnc.orig/libvncserver/sockets.c	2011-01-20 16:42:41.000000000 +0100
-+++ vnc/libvncserver/sockets.c	2011-01-21 10:20:03.000000000 +0100
-@@ -613,7 +613,11 @@ rfbReadExactTimeout(rfbClientPtr cl, char* buf, int len, int timeout)
+--- libvncserver-LibVNCServer-0.9.13.orig/libvncserver/sockets.c
++++ libvncserver-LibVNCServer-0.9.13/libvncserver/sockets.c
+@@ -638,7 +638,11 @@ rfbReadExactTimeout(rfbClientPtr cl, cha
              n = read(sock, buf, len);
          }
  #else
@@ -30,7 +29,7 @@ Index: vnc/libvncserver/sockets.c
  #endif
  
          if (n > 0) {
-@@ -801,7 +805,11 @@ rfbWriteExact(rfbClientPtr cl,
+@@ -826,7 +830,11 @@ rfbWriteExact(rfbClientPtr cl,
  	    n = rfbssl_write(cl, buf, len);
  	else
  #endif
@@ -42,21 +41,21 @@ Index: vnc/libvncserver/sockets.c
  
          if (n > 0) {
  
-Index: vnc/rfb/rfb.h
+Index: libvncserver-LibVNCServer-0.9.13/rfb/rfb.h
 ===================================================================
---- vnc.orig/rfb/rfb.h	2011-01-20 16:36:06.000000000 +0100
-+++ vnc/rfb/rfb.h	2011-01-21 06:44:22.000000000 +0100
-@@ -397,6 +397,9 @@
-     struct _rfbStatList *Next;
- } rfbStatList;
+--- libvncserver-LibVNCServer-0.9.13.orig/rfb/rfb.h
++++ libvncserver-LibVNCServer-0.9.13/rfb/rfb.h
+@@ -411,6 +411,9 @@ typedef struct _rfbStatList {
+ typedef struct _rfbSslCtx rfbSslCtx;
+ typedef struct _wsCtx wsCtx;
  
 +typedef ssize_t (*sock_read_fn_t)(struct _rfbClientRec *cl, void *buf, size_t count);
 +typedef ssize_t (*sock_write_fn_t)(struct _rfbClientRec *cl, const void *buf, size_t count);
 +
  typedef struct _rfbClientRec {
-   
-     /* back pointer to the screen */
-@@ -417,6 +420,10 @@
+ 
+     /** back pointer to the screen */
+@@ -431,6 +434,10 @@ typedef struct _rfbClientRec {
      void* clientData;
      ClientGoneHookPtr clientGoneHook;
  
@@ -64,6 +63,6 @@ Index: vnc/rfb/rfb.h
 +    sock_read_fn_t sock_read_fn;
 +    sock_read_fn_t sock_write_fn;
 +
-     SOCKET sock;
+     rfbSocket sock;
      char *host;
  
