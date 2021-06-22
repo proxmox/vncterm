@@ -11,6 +11,7 @@ VNCSRC=${VNCREL}.tar.gz
 VNCLIB=${VNCDIR}/libvncserver.a
 
 DEB=${PACKAGE}_${DEB_VERSION_UPSTREAM_REVISION}_${DEB_BUILD_ARCH}.deb
+DBG_DEB=${PACKAGE}-dbgysm_${DEB_VERSION_UPSTREAM_REVISION}_${DEB_BUILD_ARCH}.deb
 
 CPPFLAGS += -O2 -g -Wall -Wno-deprecated-declarations -D_GNU_SOURCE -I $(VNCDIR)
 
@@ -49,7 +50,7 @@ install: vncterm vncterm.1 font.data
 	mkdir -p ${DESTDIR}/usr/share/man/man1
 	install -m 0644 vncterm.1 ${DESTDIR}/usr/share/man/man1
 	mkdir -p ${DESTDIR}/usr/bin
-	install -s -m 0755 vncterm ${DESTDIR}/usr/bin
+	install -m 0755 vncterm ${DESTDIR}/usr/bin
 
 .PHONY: dinstall
 dinstall: ${DEB}
@@ -70,7 +71,7 @@ ${DEB}:
 
 .PHONY: upload
 upload: ${DEB}
-	tar cf - ${DEB} | ssh -X repoman@repo.proxmox.com -- upload --product pve --dist bullseye
+	tar cf - ${DEB} ${DBG_DEB} | ssh -X repoman@repo.proxmox.com -- upload --product pve --dist bullseye
 
 .PHONY: clean
 clean:
