@@ -9,7 +9,6 @@ Build-Depends: cmake,
                libjpeg62-turbo-dev,
                libpng-dev,
                quilt,
-               tar,
                unifont,
                zlib1g-dev,
 Standards-Version: 4.6.1
@@ -18,11 +17,11 @@ Package: vncterm
 Architecture: any
 Section: x11
 Priority: optional
-Depends: libc6 (>= 2.7-18),
-         libgnutls-deb0-28 | libgnutls30,
+Depends: libgnutls-deb0-28 | libgnutls30,
          libjpeg62-turbo,
          libpng16-16,
          zlib1g (>= 1:1.2.1),
+         ${misc:Depends},
          ${shlibs:Depends},
 Description: VNC Terminal Emulator
  With vncterm you can start commands and export its standard input and
