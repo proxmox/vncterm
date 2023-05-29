@@ -4,7 +4,7 @@ include /usr/share/dpkg/architecture.mk
 PACKAGE=vncterm
 GITVERSION:=$(shell cat .git/refs/heads/master)
 
-VNCVER=0.9.13
+VNCVER=0.9.14
 VNCREL=LibVNCServer-${VNCVER}
 VNCDIR=libvncserver-${VNCREL}
 VNCSRC=${VNCREL}.tar.gz
