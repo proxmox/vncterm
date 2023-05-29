@@ -10,7 +10,7 @@ Build-Depends: cmake,
                tar,
                unifont,
                zlib1g-dev,
-Standards-Version: 4.5.1
+Standards-Version: 4.6.1
 
 Package: vncterm
 Architecture: any
