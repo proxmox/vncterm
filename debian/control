@@ -1,4 +1,6 @@
 Source: vncterm
+Section: admin
+Priority: optional
 Maintainer: Proxmox Support Team <support@proxmox.com>
 Build-Depends: cmake,
                debhelper-compat (= 12),
