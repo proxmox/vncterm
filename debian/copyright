@@ -1,0 +1,43 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Source: git://git.proxmox.com/git/vncterm.git
+
+Files:
+ *
+Copyright: 2007 - 2023, Proxmox Support Team <support@proxmox.com>
+License: AGPL-3.0-or-later
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU Affero General Public License as published by the Free
+ Software Foundation, either version 3 of the License, or (at your option) any
+ later version.
+ .
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ details.
+ .
+ You should have received a copy of the GNU Affero General Public License along
+ with this program. If not, see <https://www.gnu.org/licenses/>.
+Comment:
+ The authors take the provided option to use the LibVNC as GPL 2 *or later*,
+ and use it as GPL 3, allowing combination with our AGPLv3 code.
+
+Files:
+ LibVNCServer-*.tar*
+Copyright: 2001-2003, Johannes E. Schindelin
+           2001 - 2022, The LibVNC Authors
+License: GPL-2+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+ .
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ .
+ You should have received a copy of the GNU General Public License
+ along with this package; if not, see &lt;https://www.gnu.org/licenses/&gt;.
+Comment:
+ On Debian systems, the full text of the GNU General Public License
+ version 2 can be found in the file '/usr/share/common-licenses/GPL-2'.

@@ -43,8 +43,6 @@ wchardata.c:
 
 .PHONY: install
 install: vncterm vncterm.1 font.data
-	mkdir -p $(DESTDIR)/usr/share/doc/$(PACKAGE)
-	install -m 0644 copyright $(DESTDIR)/usr/share/doc/$(PACKAGE)
 	mkdir -p $(DESTDIR)/usr/share/$(PACKAGE)
 	install -m 0644 font.data $(DESTDIR)/usr/share/$(PACKAGE)
 	mkdir -p $(DESTDIR)/usr/share/man/man1
