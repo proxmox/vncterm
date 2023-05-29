@@ -13,7 +13,7 @@ VNCLIB=$(VNCDIR)/libvncserver.a
 DSC = $(PACKAGE)_$(DEB_VERSION).dsc
 
 DEB=$(PACKAGE)_$(DEB_VERSION)_$(DEB_HOST_ARCH).deb
-DBG_DEB=$(PACKAGE)-dbgysm_$(DEB_VERSION)_$(DEB_HOST_ARCH).deb
+DBG_DEB=$(PACKAGE)-dbgsym_$(DEB_VERSION)_$(DEB_HOST_ARCH).deb
 
 CPPFLAGS += -O2 -g -Wall -Wno-deprecated-declarations -D_GNU_SOURCE -I $(VNCDIR)
 
