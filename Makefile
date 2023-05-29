@@ -3,7 +3,6 @@ include /usr/share/dpkg/architecture.mk
 
 PACKAGE=vncterm
 BUILDDIR ?= $(PACKAGE)-$(DEB_VERSION_UPSTREAM)
-GITVERSION:=$(shell cat .git/refs/heads/master)
 
 VNCVER=0.9.14
 VNCREL=LibVNCServer-$(VNCVER)
@@ -64,7 +63,7 @@ vncterm.1: vncterm.pod
 $(BUILDDIR):
 	rm -rf $@ $@.tmp
 	rsync -a . $@.tmp
-	echo "git clone git://git.proxmox.com/git/vncterm.git\\ngit checkout $(GIVERSION)" > $@.tmp/debian/SOURCE
+	echo "git clone git://git.proxmox.com/git/vncterm.git\\ngit checkout $$(git rev-parse HEAD)" > $@.tmp/debian/SOURCE
 	mv $@.tmp $@
 
 .PHONY: deb
