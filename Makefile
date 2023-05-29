@@ -11,6 +11,8 @@ VNCDIR=libvncserver-$(VNCREL)
 VNCSRC=$(VNCREL).tar.gz
 VNCLIB=$(VNCDIR)/libvncserver.a
 
+DSC = $(PACKAGE)_$(DEB_VERSION).dsc
+
 DEB=$(PACKAGE)_$(DEB_VERSION)_$(DEB_HOST_ARCH).deb
 DBG_DEB=$(PACKAGE)-dbgysm_$(DEB_VERSION)_$(DEB_HOST_ARCH).deb
 
@@ -71,13 +73,27 @@ $(DEB): $(BUILDDIR)
 	cd $(BUILDDIR); dpkg-buildpackage -rfakeroot -b -us -uc
 	lintian $(DEB)
 
+.PHONY: dsc
+dsc: $(DSC)
+	rm -rf $(BUILDDIR) $(DSC)
+	$(MAKE) $(DSC)
+	lintian $(DSC)
+
+$(DSC): $(BUILDDIR)
+	cd $(BUILDDIR); dpkg-buildpackage -S -us -uc
+
+sbuild: $(DSC)
+	sbuild $<
+
 .PHONY: upload
 upload: $(DEB)
 	tar cf - $(DEB) $(DBG_DEB) | ssh -X repoman@repo.proxmox.com -- upload --product pve --dist bullseye
 
 .PHONY: clean
 clean:
-	rm -rf vncterm vncterm.1 vncterm_*.deb genfont genfont2 *~ $(VNCDIR) vncterm-*.tar.gz glyph.h.tmp build *.changes wchardata.c font.data.tmp font.data *.buildinfo
+	rm -f *.dsc *.deb $(PACKAGE)*.tar* *.changes *.build *.buildinfo
+	rm -f vncterm vncterm.1 genfont genfont2 *~ *.tmp wchardata.c font.data
+	rm -rf $(VNCDIR) $(PACKAGE)-[0-9]*/
 
 .PHONY: distclean
 distclean: clean
