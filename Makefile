@@ -2,6 +2,7 @@ include /usr/share/dpkg/pkg-info.mk
 include /usr/share/dpkg/architecture.mk
 
 PACKAGE=vncterm
+BUILDDIR ?= $(PACKAGE)-$(DEB_VERSION_UPSTREAM)
 GITVERSION:=$(shell cat .git/refs/heads/master)
 
 VNCVER=0.9.14
@@ -58,13 +59,16 @@ vncterm.1: vncterm.pod
 	rm -f $@
 	pod2man -n $< -s 1 -r $(DEB_VERSION_UPSTREAM) <$< >$@
 
+$(BUILDDIR):
+	rm -rf $@ $@.tmp
+	rsync -a . $@.tmp
+	echo "git clone git://git.proxmox.com/git/vncterm.git\\ngit checkout $(GIVERSION)" > $@.tmp/debian/SOURCE
+	mv $@.tmp $@
+
 .PHONY: deb
 deb: $(DEB)
-$(DEB):
-	$(MAKE) clean
-	rsync -a . --exclude build build
-	echo "git clone git://git.proxmox.com/git/vncterm.git\\ngit checkout $(GIVERSION)" > build/debian/SOURCE
-	cd build; dpkg-buildpackage -rfakeroot -b -us -uc
+$(DEB): $(BUILDDIR)
+	cd $(BUILDDIR); dpkg-buildpackage -rfakeroot -b -us -uc
 	lintian $(DEB)
 
 .PHONY: upload
