@@ -68,7 +68,7 @@ $(BUILDDIR):
 
 .PHONY: deb
 deb: $(DEB)
-$(DEB): $(BUILDDIR)
+$(DEB) $(DBG_DEB) &: $(BUILDDIR)
 	cd $(BUILDDIR); dpkg-buildpackage -rfakeroot -b -us -uc
 	lintian $(DEB)
 
