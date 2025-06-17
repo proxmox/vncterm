@@ -1,3 +1,9 @@
+vncterm (1.9.0) trixie; urgency=medium
+
+  * re-build for Debian Trixie based releases.
+
+ -- Proxmox Support Team <support@proxmox.com>  Tue, 17 Jun 2025 11:22:12 +0200
+
 vncterm (1.8.0) bookworm; urgency=medium
 
   * re-build for Debian 12 Bookworm based releases
