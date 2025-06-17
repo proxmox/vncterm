@@ -24,34 +24,31 @@
      a binary format used in vncterm to render glyphs.
 */
 
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <inttypes.h>
 #include <errno.h>
 #include <getopt.h>
+#include <inttypes.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #define NUMCODEPOINTS 0xFFFF
 #define GLYPHLINES 16
 #define INDEXLENGTH 4
 
 /* parses strings like 00F0 to the integer */
-long
-parsehex(char *val, size_t length)
-{
+long parsehex(char *val, size_t length) {
     unsigned int value = 0;
 
     for (size_t i = 0; i < length; i++) {
-	value *= 16;
-	if (val[i] >= '0' && val[i] <= '9') {
-	    value += (val[i] - '0');
-	} else if (val[i] >= 'A' && val[i] <= 'F') {
-	    value += (val[i] - 'A' + 10);
-	} else if (val[i] >= 'a' && val[i] <= 'f') {
-	    value += (val[i] - 'a' + 10);
-	} else {
-	    return -1;
-	}
+        value *= 16;
+        if (val[i] >= '0' && val[i] <= '9') {
+            value += (val[i] - '0');
+        } else if (val[i] >= 'A' && val[i] <= 'F') {
+            value += (val[i] - 'A' + 10);
+        } else if (val[i] >= 'a' && val[i] <= 'f') {
+            value += (val[i] - 'a' + 10);
+        } else {
+            return -1;
+        }
     }
 
     return value;
@@ -69,9 +66,7 @@ void usage(char **argv) {
     printf("\nThe input has to be formatted in the hex format of unifont.\n");
 }
 
-int
-main (int argc, char** argv)
-{
+int main(int argc, char **argv) {
     FILE *fd;
     FILE *outfd;
     char *line = NULL;
@@ -79,104 +74,106 @@ main (int argc, char** argv)
     char *fontfile = NULL;
     char *outfile = NULL;
     size_t linesize = 0;
-    uint8_t emptyglyph[GLYPHLINES*2] = { 0 };
-    uint8_t glyph[GLYPHLINES*2] = { 0 };
+    uint8_t emptyglyph[GLYPHLINES * 2] = {0};
+    uint8_t glyph[GLYPHLINES * 2] = {0};
     int nextcodepoint = 0;
     int codepoint = 0;
     int c;
 
     static struct option long_options[] = {
-	{"help", no_argument, 0, 'h'},
-	{"output", required_argument, 0, 'o'},
-	{"input", required_argument, 0, 'i'},
-	{ 0 , 0, 0, 0}
+        {"help", no_argument, 0, 'h'},
+        {"output", required_argument, 0, 'o'},
+        {"input", required_argument, 0, 'i'},
+        {0, 0, 0, 0}
     };
     int option_index = 0;
 
-    while((c = getopt_long(argc, argv, "hi:o:", long_options, &option_index)) != -1) {
-	switch (c) {
-	    case 'h':
-		usage(argv);
-		exit(0);
-		break;
-	    case 'o':
-		outfile = optarg;
-		break;
-	    case 'i':
-		fontfile = optarg;
-		break;
-	    default:
-		usage(argv);
-		exit(1);
-	}
+    while ((c = getopt_long(argc, argv, "hi:o:", long_options, &option_index)) != -1) {
+        switch (c) {
+        case 'h':
+            usage(argv);
+            exit(0);
+            break;
+        case 'o':
+            outfile = optarg;
+            break;
+        case 'i':
+            fontfile = optarg;
+            break;
+        default:
+            usage(argv);
+            exit(1);
+        }
     }
 
-    if (fontfile != NULL){
-	fd = fopen(fontfile, "r");
-	if (fd == NULL) {
-	    fprintf(stderr, "Error opening '%s'\n", fontfile);
-	    perror(NULL);
-	    exit(2);
-	}
+    if (fontfile != NULL) {
+        fd = fopen(fontfile, "r");
+        if (fd == NULL) {
+            fprintf(stderr, "Error opening '%s'\n", fontfile);
+            perror(NULL);
+            exit(2);
+        }
     } else {
-	fd = stdin;
+        fd = stdin;
     }
 
     if (outfile != NULL) {
-	outfd = fopen(outfile, "w");
-	if (outfd == NULL) {
-	    fprintf(stderr, "Error opening '%s'\n", outfile);
-	    perror(NULL);
-	    exit(2);
-	}
+        outfd = fopen(outfile, "w");
+        if (outfd == NULL) {
+            fprintf(stderr, "Error opening '%s'\n", outfile);
+            perror(NULL);
+            exit(2);
+        }
     } else {
-	outfd = stdout;
+        outfd = stdout;
     }
-
 
     while (getline(&line, &linesize, fd) != -1) {
-	codepoint = parsehex(line, INDEXLENGTH);
-	if (codepoint == -1) {
-	    fprintf(stderr, "Cannot parse codepoint index: '%s'\n", line);
-	    free(line);
-	    exit(4);
-	}
+        codepoint = parsehex(line, INDEXLENGTH);
+        if (codepoint == -1) {
+            fprintf(stderr, "Cannot parse codepoint index: '%s'\n", line);
+            free(line);
+            exit(4);
+        }
 
-	/* fill in missing codepoints with empty glyphs */
-	while (nextcodepoint++ < codepoint) {
-	    fwrite(emptyglyph, sizeof(emptyglyph), 1, outfd);
-	}
+        /* fill in missing codepoints with empty glyphs */
+        while (nextcodepoint++ < codepoint) {
+            fwrite(emptyglyph, sizeof(emptyglyph), 1, outfd);
+        }
 
-	tmp = line + INDEXLENGTH + 1;
-	size_t i = 0;
+        tmp = line + INDEXLENGTH + 1;
+        size_t i = 0;
 
-	/* parse until end of line */
-	while (*(tmp+i*2) != '\n' && i < sizeof(glyph)) {
-	    int value = parsehex(tmp+i*2, 2);
+        /* parse until end of line */
+        while (*(tmp + i * 2) != '\n' && i < sizeof(glyph)) {
+            int value = parsehex(tmp + i * 2, 2);
 
-	    if (value == -1) {
-		fprintf(stderr, "Cannot parse glyph from line: '%s' at position %ld ('%s')\n", line, i*2, tmp+i*2);
-		free(line);
-		exit(4);
-	    }
+            if (value == -1) {
+                fprintf(
+                    stderr, "Cannot parse glyph from line: '%s' at position %ld ('%s')\n", line,
+                    i * 2, tmp + i * 2
+                );
+                free(line);
+                exit(4);
+            }
 
-	    glyph[i++] = (uint8_t)value;
-	}
+            glyph[i++] = (uint8_t)value;
+        }
 
-	/* if we have a 1width glyph, fill the rest with zeroes */
-	while (i < sizeof(glyph)) {
-	    glyph[i++] = 0;
-	}
+        /* if we have a 1width glyph, fill the rest with zeroes */
+        while (i < sizeof(glyph)) {
+            glyph[i++] = 0;
+        }
 
-	fwrite(glyph, sizeof(glyph), 1, outfd);
+        fwrite(glyph, sizeof(glyph), 1, outfd);
     }
 
-    if(errno) {
-	perror("Cannot not read line from file");
+    if (errno) {
+        perror("Cannot not read line from file");
     }
 
     while (nextcodepoint++ <= NUMCODEPOINTS) {
-	fwrite(emptyglyph, sizeof(emptyglyph), 1, outfd);
+        fwrite(emptyglyph, sizeof(emptyglyph), 1, outfd);
     }
 
     free(line);
