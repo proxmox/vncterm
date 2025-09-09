@@ -58,8 +58,6 @@ typedef struct vncTerm {
     unsigned int esc_count;
     unsigned int esc_ques;
     unsigned int esc_has_par;
-    char osc_textbuf[4096];
-    char osc_cmd;
     unsigned int region_top;
     unsigned int region_bottom;
 
