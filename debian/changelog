@@ -1,3 +1,9 @@
+vncterm (1.9.1) trixie; urgency=medium
+
+  * osc: remove buffer that was only used for debug information.
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 17 Sep 2025 17:07:44 +0200
+
 vncterm (1.9.0) trixie; urgency=medium
 
   * re-build for Debian Trixie based releases.
