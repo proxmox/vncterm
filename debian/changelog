@@ -1,3 +1,9 @@
+vncterm (1.8.1) bookworm; urgency=medium
+
+  * osc: remove buffer that was only used for debug information.
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 17 Sep 2025 17:15:23 +0200
+
 vncterm (1.8.0) bookworm; urgency=medium
 
   * re-build for Debian 12 Bookworm based releases
