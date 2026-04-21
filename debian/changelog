@@ -1,3 +1,19 @@
+vncterm (1.9.2) trixie; urgency=medium
+
+  * add '-verify-port' option for handling VNC tickets which do encode the
+    port.
+
+  * keep track of whether TLS and PVE API endpoint for auth is used
+    explicitly.
+
+  * auth: verify that VNC ticket matches user-provided ticket as an additional
+    defense-in-depth measure.
+
+  * auth: add random delay before rejecting failed authentication to hedge
+    against timing attacks.
+
+ -- Proxmox Support Team <support@proxmox.com>  Tue, 21 Apr 2026 21:19:53 +0200
+
 vncterm (1.9.1) trixie; urgency=medium
 
   * osc: remove buffer that was only used for debug information.
