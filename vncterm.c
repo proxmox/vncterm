@@ -38,10 +38,12 @@
 #include <string.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
+#include <sys/random.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <unistd.h>
 
 #include "vncterm.h"
 
@@ -427,6 +429,14 @@ static void vencrypt_subauth_plain(rfbClientPtr cl) {
 err:
     rfbLog("VencryptPlain: %s\n", err ? err : "no reason specified");
     if (err) {
+        uint16_t delay;
+        ssize_t res = getrandom((void *)&delay, sizeof(delay), 0);
+        if (res == sizeof(delay)) {
+            /* Random delay ranging from 16us to ~1s before rejecting. */
+            usleep(delay << 4);
+        } else {
+            rfbLog("VencryptPlain: failed to get random bytes: %ld", res);
+        }
         rfbEncodeU32(buf, 1); /* Reject auth */
         rfbWriteExact(cl, buf, 4);
         if (cl->protocolMinorVersion >= 8) {
