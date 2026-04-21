@@ -57,6 +57,12 @@ char *listen_port = "5900"; // default when not set with '-rfbport'
 bool verify_port = false;
 bool use_tls_and_pve_auth = true;
 
+/*
+ * When using (TLS and) auth via PVE API, this is the pinned API ticket to verify against.
+ * Otherwise the VNC protocol password.
+ */
+static char *vncsecret = NULL;
+
 uint16_t screen_width = 744;
 uint16_t screen_height = 400;
 
@@ -148,6 +154,21 @@ static int pve_auth_verify(const char *clientip, const char *username, const cha
         p = urlencode(p, "port");
         *p++ = '=';
         p = urlencode(p, listen_port);
+    }
+
+    // Compare against the pinned ticket if present.
+    if (passwd_is_vnc_ticket && vncsecret) {
+        size_t secret_len = strlen(vncsecret);
+        if (strlen(passwd) != secret_len) {
+            fprintf(stderr, "pve_auth_verify: mismatched PVE VNC ticket\n");
+            goto err;
+        }
+        // Note that the length is already known by an attacker. Do constant time comparison when
+        // the length matches.
+        if (gnutls_memcmp(vncsecret, passwd, secret_len)) {
+            fprintf(stderr, "pve_auth_verify: mismatched PVE VNC ticket\n");
+            goto err;
+        }
     }
 
     const char *endpoint = use_vncticket_endpoint ? "vncticket" : "ticket";
@@ -2246,8 +2267,6 @@ enum rfbNewClientAction new_client(rfbClientPtr client) {
     return RFB_CLIENT_ACCEPT;
 }
 
-static char *vncticket = NULL;
-
 static void MakeRichCursor(rfbScreenInfoPtr rfbScreen) {
     int w = 16, h = 16;
     rfbCursorPtr c = rfbScreen->cursor;
@@ -2382,8 +2401,8 @@ vncTerm *create_vncterm(int argc, char **argv, int maxx, int maxy) {
     if (use_tls_and_pve_auth) {
         rfbRegisterSecurityHandler(&VncSecurityHandlerVencrypt);
     } else {
-        assert(vncticket);
-        passwds[0] = vncticket;
+        assert(vncsecret);
+        passwds[0] = vncsecret;
         passwds[1] = NULL;
 
         screen->authPasswdData = (void *)passwds;
@@ -2425,6 +2444,8 @@ int main(int argc, char **argv) {
         fprintf(stderr, "gnutls_dh_params_init failed\n");
         exit(-1);
     }
+
+    vncsecret = getenv("PVE_VNC_TICKET");
 
     for (i = 1; i < argc; i++) {
         if (!strcmp(argv[i], "-c")) {
@@ -2474,7 +2495,7 @@ int main(int argc, char **argv) {
             use_tls_and_pve_auth = false;
             rfbPurgeArguments(&argc, &i, 1, argv);
             i--;
-            if ((vncticket = getenv("PVE_VNC_TICKET")) == NULL) {
+            if (!vncsecret) {
                 fprintf(stderr, "missing env PVE_VNC_TICKET (-notls)\n");
                 exit(-1);
             }
