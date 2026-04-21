@@ -23,6 +23,7 @@
 */
 
 #include <arpa/inet.h>
+#include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <locale.h>
@@ -54,6 +55,7 @@ char *auth_path = "/";
 char *auth_perm = "Sys.Console";
 char *listen_port = "5900"; // default when not set with '-rfbport'
 bool verify_port = false;
+bool use_tls_and_pve_auth = true;
 
 uint16_t screen_width = 744;
 uint16_t screen_height = 400;
@@ -2377,14 +2379,15 @@ vncTerm *create_vncterm(int argc, char **argv, int maxx, int maxy) {
 
     // screen->autoPort = 1;
 
-    if (vncticket) {
+    if (use_tls_and_pve_auth) {
+        rfbRegisterSecurityHandler(&VncSecurityHandlerVencrypt);
+    } else {
+        assert(vncticket);
         passwds[0] = vncticket;
         passwds[1] = NULL;
 
         screen->authPasswdData = (void *)passwds;
         screen->passwordCheck = rfbCheckPasswordByList;
-    } else {
-        rfbRegisterSecurityHandler(&VncSecurityHandlerVencrypt);
     }
 
     rfbInitServer(screen);
@@ -2468,6 +2471,7 @@ int main(int argc, char **argv) {
             rfbPurgeArguments(&argc, &i, 2, argv);
             i--;
         } else if (!strcmp(argv[i], "-notls")) {
+            use_tls_and_pve_auth = false;
             rfbPurgeArguments(&argc, &i, 1, argv);
             i--;
             if ((vncticket = getenv("PVE_VNC_TICKET")) == NULL) {
