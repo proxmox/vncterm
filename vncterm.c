@@ -31,6 +31,7 @@
 #include <rfb/keysym.h>
 #include <rfb/rfb.h>
 #include <signal.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -51,6 +52,8 @@
 
 char *auth_path = "/";
 char *auth_perm = "Sys.Console";
+char *listen_port = "5900"; // default when not set with '-rfbport'
+bool verify_port = false;
 
 uint16_t screen_width = 744;
 uint16_t screen_height = 400;
@@ -109,16 +112,22 @@ static int pve_auth_verify(const char *clientip, const char *username, const cha
         goto err;
     }
 
+    bool passwd_is_vnc_ticket = !strncmp(passwd, "PVEVNC:", 7);
+
+    // Verify port only works with the 'vncticket' endpoint. If not a VNC ticket, use password-based
+    // auth via the 'ticket' endpoint.
+    bool use_vncticket_endpoint = verify_port && passwd_is_vnc_ticket;
+
     char buf[8192];
     char form[8192];
 
     char *p = form;
-    p = urlencode(p, "username");
+    p = urlencode(p, use_vncticket_endpoint ? "authid" : "username");
     *p++ = '=';
     p = urlencode(p, username);
 
     *p++ = '&';
-    p = urlencode(p, "password");
+    p = urlencode(p, use_vncticket_endpoint ? "vncticket" : "password");
     *p++ = '=';
     p = urlencode(p, passwd);
 
@@ -132,15 +141,24 @@ static int pve_auth_verify(const char *clientip, const char *username, const cha
     *p++ = '=';
     p = urlencode(p, auth_perm);
 
+    if (use_vncticket_endpoint) {
+        *p++ = '&';
+        p = urlencode(p, "port");
+        *p++ = '=';
+        p = urlencode(p, listen_port);
+    }
+
+    const char *endpoint = use_vncticket_endpoint ? "vncticket" : "ticket";
+
     sprintf(
         buf,
-        "POST /api2/json/access/ticket HTTP/1.1\n"
+        "POST /api2/json/access/%s HTTP/1.1\n"
         "Host: localhost:85\n"
         "Connection: close\n"
         "PVEClientIP: %s\n"
         "Content-Type: application/x-www-form-urlencoded\n"
         "Content-Length: %zd\n\n%s\n",
-        clientip, strlen(form), form
+        endpoint, clientip, strlen(form), form
     );
     ssize_t len = strlen(buf);
     ssize_t sb = send(sfd, buf, len, 0);
@@ -2456,6 +2474,14 @@ int main(int argc, char **argv) {
                 fprintf(stderr, "missing env PVE_VNC_TICKET (-notls)\n");
                 exit(-1);
             }
+        } else if (!strcmp(argv[i], "-rfbport")) {
+            CHECK_ARGC(argc, argv, i);
+            listen_port = argv[i + 1];
+            // do not purge port argument, need to pass it along to child
+        } else if (!strcmp(argv[i], "-verify-port")) {
+            verify_port = true;
+            rfbPurgeArguments(&argc, &i, 1, argv);
+            i--;
         }
     }
 
